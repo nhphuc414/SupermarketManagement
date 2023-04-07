@@ -11,31 +11,28 @@ import java.util.UUID;
  * @author ad
  */
 public class Branch {
-    
+
     private String id;
     private String branchName;
     private String address;
-    private String number;
-    {
-        id = UUID.randomUUID().toString();
-    }
 
     public Branch() {
-    }
-    
-    public Branch(String branchName, String address, String number) {
-        this.branchName = branchName;
-        this.address = address;
-        this.number = number;
+        this.id = UUID.randomUUID().toString();
     }
 
-    public Branch(String id, String branchName, String address, String number) {
+    public Branch(String branchName, String address) {
+        this();
+        this.branchName = branchName;
+        this.address = address;
+
+    }
+
+    public Branch(String id, String branchName, String address) {
         this.id = id;
         this.branchName = branchName;
         this.address = address;
-        this.number = number;
     }
- 
+
     /**
      * @return the id
      */
@@ -77,19 +74,4 @@ public class Branch {
     public void setAddress(String address) {
         this.address = address;
     }
-
-    /**
-     * @return the number
-     */
-    public String getNumber() {
-        return number;
-    }
-
-    /**
-     * @param number the number to set
-     */
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
 }

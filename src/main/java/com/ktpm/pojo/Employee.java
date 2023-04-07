@@ -18,38 +18,44 @@ public class Employee {
     private String number;
     private Date birthday;
     private Date joinDate;
-    private employeeRole role;
+    private String username;
+    private String password;
+    private EmployeeRole employeeRole;
     private String brandId;
 
-    public enum employeeRole {
+    public enum EmployeeRole {
         Manager,
         Employee
     }
 
     public Employee() {
-        this.id = UUID.randomUUID().toString();
+        this.id=UUID.randomUUID().toString();
     }
 
-    public Employee(String employeeName, String number, Date birthday, Date joinDate, employeeRole role, String brandId) {
+    public Employee(String employeeName, String number, Date birthday, Date joinDate, String username, String password, EmployeeRole employeeRole, String brandId) {
         this();
         this.employeeName = employeeName;
         this.number = number;
         this.birthday = birthday;
         this.joinDate = joinDate;
-        this.role = role;
+        this.username = username;
+        this.password = password;
+        this.employeeRole = employeeRole;
         this.brandId = brandId;
     }
-
-    public Employee(String id, String employeeName, String number, Date birthday, Date joinDate, employeeRole role, String brandId) {
+    
+    public Employee(String id, String employeeName, String number, Date birthday, Date joinDate, String username, String password, EmployeeRole employeeRole, String brandId) {
         this.id = id;
         this.employeeName = employeeName;
         this.number = number;
         this.birthday = birthday;
         this.joinDate = joinDate;
-        this.role = role;
+        this.username = username;
+        this.password = password;
+        this.employeeRole = employeeRole;
         this.brandId = brandId;
     }
-
+    
     /**
      * @return the id
      */
@@ -121,17 +127,45 @@ public class Employee {
     }
 
     /**
-     * @return the role
+     * @return the username
      */
-    public employeeRole getRole() {
-        return role;
+    public String getUsername() {
+        return username;
     }
 
     /**
-     * @param role the role to set
+     * @param username the username to set
      */
-    public void setRole(employeeRole role) {
-        this.role = role;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    /**
+     * @return the employeeRole
+     */
+    public EmployeeRole getEmployeeRole() {
+        return employeeRole;
+    }
+
+    /**
+     * @param employeeRole the employeeRole to set
+     */
+    public void setEmployeeRole(EmployeeRole employeeRole) {
+        this.employeeRole = employeeRole;
     }
 
     /**
@@ -147,5 +181,4 @@ public class Employee {
     public void setBrandId(String brandId) {
         this.brandId = brandId;
     }
-
 }
