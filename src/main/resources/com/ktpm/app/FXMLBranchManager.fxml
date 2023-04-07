@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.net.URL?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLBranchManagerController">
+    <stylesheets>
+        <URL value="@/styles/fxmlbranchmanager.css" />
+    </stylesheets>
+   <children>
+      <AnchorPane id="AnchorPane" layoutX="20.0" layoutY="20.0" prefHeight="120.0" prefWidth="1280.0" styleClass="mainFxmlClass" AnchorPane.bottomAnchor="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <stylesheets>
+            <URL value="@/styles/fxmlbranchmanager.css" />
+         </stylesheets>
+         <children>
+            <Label layoutX="541.0" layoutY="60.0" text="Quản lý chi nhánh" />
+         </children>
+      </AnchorPane>
+      <AnchorPane id="AnchorPane" layoutX="14.0" layoutY="98.0" prefHeight="580.0" prefWidth="500.0" styleClass="mainFxmlClass" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="780.0" AnchorPane.topAnchor="120.0">
+         <stylesheets>
+            <URL value="@/styles/fxmlbranchmanager.css" />
+         </stylesheets>
+         <children>
+            <TextField fx:id="txtName" layoutX="50.0" layoutY="39.0" prefHeight="35.0" prefWidth="240.0" promptText="Tên chi nhánh" />
+            <TextField fx:id="txtAddress" layoutX="50.0" layoutY="111.0" prefHeight="35.0" prefWidth="400.0" promptText="Địa chỉ" />
+            <TextField fx:id="txtNumber" layoutX="50.0" layoutY="189.0" prefHeight="35.0" prefWidth="216.0" promptText="Số điện thoại" />
+            <TextField fx:id="txtId" layoutX="50.0" layoutY="265.0" promptText="Id" />
+         </children>
+      </AnchorPane>
+      <AnchorPane id="AnchorPane" layoutX="20.0" layoutY="20.0" prefHeight="700.0" prefWidth="500.0" styleClass="mainFxmlClass" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
+         <stylesheets>
+            <URL value="@/styles/fxmlbranchmanager.css" />
+         </stylesheets>
+         <children>
+            <TableView fx:id="tableView" layoutX="14.0" layoutY="14.0" onMouseClicked="#loadOnField" prefHeight="546.0" prefWidth="750.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+         </children>
+      </AnchorPane>
+   </children>
+</AnchorPane>
