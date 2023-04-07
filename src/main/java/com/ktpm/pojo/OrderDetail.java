@@ -15,16 +15,14 @@ public class OrderDetail {
     private String productId;
     private String orderId;
     private double quantity;
-    private double price;
    
     public OrderDetail() {
         this.id=UUID.randomUUID().toString();
     }
-    public OrderDetail(String productId, String orderId, double quantity, double price) {
+    public OrderDetail(String productId, String orderId, double quantity) {
         this.productId = productId;
         this.orderId = orderId;
-        this.quantity = quantity;
-        this.price = price;
+        this.quantity = quantity;   
     }
 
     public OrderDetail(String id, String productId, String orderId, double quantity, double price) {
@@ -32,7 +30,6 @@ public class OrderDetail {
         this.productId = productId;
         this.orderId = orderId;
         this.quantity = quantity;
-        this.price = price;
     }
 
     
@@ -92,19 +89,4 @@ public class OrderDetail {
     public void setQuantity(double quantity) {
         this.quantity = quantity;
     }
-
-    /**
-     * @return the price
-     */
-    public double getPrice() {
-        return price;
-    }
-
-    /**
-     * @param price the price to set
-     */
-    public void setPrice(double price) {
-        this.price = price;
-    }
-    
 }

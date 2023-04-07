@@ -15,7 +15,6 @@ public class Order {
 
     private String id;
     private Date orderDate;
-    private double total;
     private double cash_received;
     private String customerId;
     private String employeeId;
@@ -24,19 +23,17 @@ public class Order {
         id = UUID.randomUUID().toString();
     }
 
-    public Order(Date orderDate, double total, double cash_received, String customerId, String employeeId) {
+    public Order(Date orderDate, double cash_received, String customerId, String employeeId) {
         this();
         this.orderDate = orderDate;
-        this.total = total;
         this.cash_received = cash_received;
         this.customerId = customerId;
         this.employeeId = employeeId;
     }
 
-    public Order(String id, Date orderDate, double total, double cash_received, String customerId, String employeeId) {
+    public Order(String id, Date orderDate, double cash_received, String customerId, String employeeId) {
         this.id = id;
         this.orderDate = orderDate;
-        this.total = total;
         this.cash_received = cash_received;
         this.customerId = customerId;
         this.employeeId = employeeId;
@@ -68,20 +65,6 @@ public class Order {
      */
     public void setOrderDate(Date orderDate) {
         this.orderDate = orderDate;
-    }
-
-    /**
-     * @return the total
-     */
-    public double getTotal() {
-        return total;
-    }
-
-    /**
-     * @param total the total to set
-     */
-    public void setTotal(double total) {
-        this.total = total;
     }
 
     /**

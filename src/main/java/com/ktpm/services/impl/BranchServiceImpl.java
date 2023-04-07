@@ -22,26 +22,24 @@ public class BranchServiceImpl implements BranchService {
 
     @Override
     public void addBranch(Branch branch) throws SQLException {
-        String sql = "INSERT INTO branches (id, branch_name, address, number) VALUES(?,?,?,?)";
+        String sql = "INSERT INTO branches (id, branch_name, address) VALUES(?,?,?)";
         try (Connection conn = JDBCUtils.getConn();) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branch.getId());
             pstmt.setString(2, branch.getBranchName());
             pstmt.setString(3, branch.getAddress());
-            pstmt.setString(4, branch.getNumber());
             pstmt.executeUpdate();
         }
     }
 
     @Override
     public void updateBranch(Branch branch) throws SQLException {
-        String sql = "UPDATE branches SET id = ?, branch_name = ?, address = ?, number = ? WHERE id = ?";
+        String sql = "UPDATE branches SET  branch_name = ?, address = ? WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn();) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, branch.getId());
-            pstmt.setString(2, branch.getBranchName());
-            pstmt.setString(3, branch.getAddress());
-            pstmt.setString(4, branch.getNumber());
+            pstmt.setString(1, branch.getBranchName());
+            pstmt.setString(2, branch.getAddress());
+            pstmt.setString(3, branch.getId());
             pstmt.executeUpdate();
         }
     }
@@ -57,22 +55,21 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
-    public Branch getBranchByAddress(String address) throws SQLException {
-        String sql = "SELECT * FROM accounts WHERE address = ?";
+    public Branch getBranchById(String id) throws SQLException {
+        String sql = "SELECT * FROM branches WHERE id = ?";
+        Branch branch = null;
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, address);
-            try (ResultSet rs = pstmt.executeQuery()) {
-                Branch branch = null;
-                if (rs.next()) {
-                    branch = new Branch();
-                    branch.setId(rs.getString("id"));
-                    branch.setBranchName(rs.getString("branch_name"));
-                    branch.setAddress(rs.getString("address"));
-                    branch.setNumber(rs.getString("number"));
-                }
-                return branch;
+            pstmt.setString(1, id);
+
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                branch = new Branch();
+                branch.setId(rs.getString("id"));
+                branch.setBranchName(rs.getString("branch_name"));
+                branch.setAddress(rs.getString("address"));
             }
+            return branch;
         }
     }
 
@@ -86,8 +83,7 @@ public class BranchServiceImpl implements BranchService {
             while (rs.next()) {
                 Branch branch = new Branch(rs.getString("id"),
                         rs.getString("branch_name"),
-                        rs.getString("Address"),
-                        rs.getString("number"));
+                        rs.getString("Address"));
                 branches.add(branch);
             }
             return branches;

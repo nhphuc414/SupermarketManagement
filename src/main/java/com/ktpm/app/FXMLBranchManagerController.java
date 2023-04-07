@@ -39,11 +39,6 @@ public class FXMLBranchManagerController implements Initializable {
     @FXML
     private TextField txtName;
     
-    @FXML
-    private TextField txtNumber;
-    
-    @FXML
-    private TextField txtId;
 
     /**
      * Initializes the controller class.
@@ -55,15 +50,13 @@ public class FXMLBranchManagerController implements Initializable {
         ObservableList<Branch> brancherTableData = FXCollections.observableArrayList();
         List<Branch> branches = branchService.getAllBranches();
         for (Branch branch : branches) {
-            brancherTableData.add(new Branch(branch.getId(), branch.getBranchName(), branch.getAddress(), branch.getNumber()));
+            brancherTableData.add(new Branch(branch.getId(), branch.getBranchName(), branch.getAddress()));
         }
         TableColumn<Branch, String> nameColumn = new TableColumn<>("Name");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("branchName"));
         TableColumn<Branch, String> addressColumn = new TableColumn<>("Address");
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
-        TableColumn<Branch, String> numberColumn = new TableColumn<>("Number");
-        numberColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
-        tableView.getColumns().addAll(nameColumn, addressColumn, numberColumn);
+        tableView.getColumns().addAll(nameColumn, addressColumn);
         tableView.setItems(brancherTableData);
     }
 
@@ -72,7 +65,7 @@ public class FXMLBranchManagerController implements Initializable {
         if (selectedBranch != null) {
             txtName.setText(selectedBranch.getBranchName());
             txtAddress.setText(selectedBranch.getAddress());
-            txtNumber.setText(selectedBranch.getNumber());
+            
             // ...
         }
         

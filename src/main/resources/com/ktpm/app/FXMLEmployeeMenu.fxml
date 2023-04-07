@@ -5,12 +5,12 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLEmployeeMenuController">
+<AnchorPane id="AnchorPane" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLEmployeeMenuController">
     <stylesheets>
         <URL value="@/styles/fxmlemployeemenu.css" />
     </stylesheets>
    <children>
-      <Label layoutX="286.0" layoutY="43.0" text="Employee" />
-      <Button layoutX="47.0" layoutY="335.0" mnemonicParsing="false" onAction="#handleSignOut" text="Sign out" />
+      <Label layoutX="632.0" layoutY="52.0" text="Employee" />
+      <Button layoutX="14.0" layoutY="661.0" mnemonicParsing="false" onAction="#handleSignOut" text="Sign out" />
    </children>
 </AnchorPane>

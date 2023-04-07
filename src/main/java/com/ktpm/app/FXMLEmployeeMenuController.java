@@ -27,7 +27,7 @@ public class FXMLEmployeeMenuController implements Initializable {
         Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            App.setCurrentAccount(null);
+            App.setCurrentEmployee(null);
             App.setRoot("FXMLLogin");
         }
     }

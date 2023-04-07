@@ -13,13 +13,14 @@ import java.util.List;
  * @author ad
  */
 public interface BranchService {
-     public void addBranch(Branch branch) throws SQLException;
+
+    public void addBranch(Branch branch) throws SQLException;
 
     public void updateBranch(Branch branch) throws SQLException;
 
     public void deleteBranch(Branch branch) throws SQLException;
-    
-    public Branch getBranchByAddress(String address) throws SQLException;
+
+    public Branch getBranchById(String id) throws SQLException;
 
     public List<Branch> getAllBranches() throws SQLException;
 }

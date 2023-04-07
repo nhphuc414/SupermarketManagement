@@ -4,7 +4,7 @@
  */
 package com.ktpm.app;
 
-import com.ktpm.pojo.Account;
+import com.ktpm.pojo.Employee;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
@@ -12,14 +12,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import com.ktpm.services.AccountService;
-import com.ktpm.services.impl.AccountServiceImpl;
+import com.ktpm.services.EmployeeService;
+import com.ktpm.services.impl.EmployeeServiceImpl;
 import com.ktpm.utils.Utils;
 import java.io.IOException;
 import java.sql.SQLException;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
-import javafx.stage.Stage;
 
 /**
  * FXML Controller class
@@ -47,14 +46,14 @@ public class FXMLLoginController implements Initializable {
     public void loginAccount(ActionEvent handler) {
         String username = txtUsername.getText();
         String password = txtPassword.getText();
-        AccountService accountService = new AccountServiceImpl();
+        EmployeeService employeeService = new EmployeeServiceImpl();
         try {
-            Account account = accountService.getAccountByUsernameAndPassword(username, password);
-            if (account != null) {
-                App.setCurrentAccount(account);
-                if (account.getAccountType() == Account.AccountType.Admin) {
+            Employee employee = employeeService.getEmployeeByUsernameAndPassword(username, password);
+            if (employee != null) {
+                App.setCurrentEmployee(employee);
+                if (employee.getEmployeeRole() == Employee.EmployeeRole.Manager) {
                     App.setRoot("FXMLAdminMenu");
-                } else if (account.getAccountType() == Account.AccountType.Employee) {
+                } else if (employee.getEmployeeRole() == Employee.EmployeeRole.Employee) {
                     App.setRoot("FXMLEmployeeMenu");
                 }
             } else {
@@ -69,7 +68,7 @@ public class FXMLLoginController implements Initializable {
             alert.showAndWait();
         }
     }
-    
+
     /**
      * Initializes the controller class.
      *
@@ -79,7 +78,7 @@ public class FXMLLoginController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-       
+
     }
 
 }
