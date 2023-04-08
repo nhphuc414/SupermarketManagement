@@ -12,28 +12,29 @@ import java.util.UUID;
  */
 public class OrderDetail {
     private String id;
+    private double quantity;
     private String productId;
     private String orderId;
-    private double quantity;
+    
    
     public OrderDetail() {
         this.id=UUID.randomUUID().toString();
     }
-    public OrderDetail(String productId, String orderId, double quantity) {
-        this.productId = productId;
-        this.orderId = orderId;
-        this.quantity = quantity;   
-    }
 
-    public OrderDetail(String id, String productId, String orderId, double quantity, double price) {
-        this.id = id;
-        this.productId = productId;
-        this.orderId = orderId;
+    public OrderDetail(double quantity, String productId, String orderId) {
+        this();
         this.quantity = quantity;
+        this.productId = productId;
+        this.orderId = orderId;
     }
 
-    
-    
+    public OrderDetail(String id, double quantity, String productId, String orderId) {
+        this.id = id;
+        this.quantity = quantity;
+        this.productId = productId;
+        this.orderId = orderId;
+    }
+
     /**
      * @return the id
      */
@@ -46,6 +47,20 @@ public class OrderDetail {
      */
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+     * @return the quantity
+     */
+    public double getQuantity() {
+        return quantity;
+    }
+
+    /**
+     * @param quantity the quantity to set
+     */
+    public void setQuantity(double quantity) {
+        this.quantity = quantity;
     }
 
     /**
@@ -75,18 +90,5 @@ public class OrderDetail {
     public void setOrderId(String orderId) {
         this.orderId = orderId;
     }
-
-    /**
-     * @return the quantityPerUnit
-     */
-    public double getQuantity() {
-        return quantity;
-    }
-
-    /**
-     * @param quantity
-     */
-    public void setQuantity(double quantity) {
-        this.quantity = quantity;
-    }
+    
 }

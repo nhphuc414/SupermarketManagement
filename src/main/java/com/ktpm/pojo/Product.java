@@ -16,7 +16,7 @@ public class Product {
     private String productName;
     private double price;
     private String origin;
-    private ProductType type;
+    private ProductType productType;
 
     public enum ProductType {
         Quantity,
@@ -30,19 +30,19 @@ public class Product {
     public Product() {
     }
 
-    public Product(String productName, double price, String origin, ProductType type) {
+    public Product(String productName, double price, String origin, ProductType productType) {
         this.productName = productName;
         this.price = price;
         this.origin = origin;
-        this.type = type;
+        this.productType = productType;
     }
 
-    public Product(String id, String productName, double price, String origin, ProductType type) {
+    public Product(String id, String productName, double price, String origin, ProductType productType) {
         this.id = id;
         this.productName = productName;
         this.price = price;
         this.origin = origin;
-        this.type = type;
+        this.productType = productType;
     }
 
     /**
@@ -102,16 +102,16 @@ public class Product {
     }
 
     /**
-     * @return the type
+     * @return the productType
      */
-    public ProductType getType() {
-        return type;
+    public ProductType getProductType() {
+        return productType;
     }
 
     /**
-     * @param type the type to set
+     * @param productType the productType to set
      */
-    public void setType(ProductType type) {
-        this.type = type;
+    public void setProductType(ProductType productType) {
+        this.productType = productType;
     }
 }

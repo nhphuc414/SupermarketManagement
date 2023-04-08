@@ -23,7 +23,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public void addBranch(Branch branch) throws SQLException {
         String sql = "INSERT INTO branches (id, branch_name, address) VALUES(?,?,?)";
-        try (Connection conn = JDBCUtils.getConn();) {
+        try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branch.getId());
             pstmt.setString(2, branch.getBranchName());
@@ -35,7 +35,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public void updateBranch(Branch branch) throws SQLException {
         String sql = "UPDATE branches SET  branch_name = ?, address = ? WHERE id = ?";
-        try (Connection conn = JDBCUtils.getConn();) {
+        try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branch.getBranchName());
             pstmt.setString(2, branch.getAddress());
@@ -47,7 +47,7 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public void deleteBranch(Branch branch) throws SQLException {
         String sql = "DELETE FROM branches WHERE id = ?";
-        try (Connection conn = JDBCUtils.getConn();) {
+        try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branch.getId());
             pstmt.executeUpdate();
@@ -61,7 +61,6 @@ public class BranchServiceImpl implements BranchService {
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, id);
-
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()) {
                 branch = new Branch();
@@ -76,10 +75,10 @@ public class BranchServiceImpl implements BranchService {
     @Override
     public List<Branch> getAllBranches() throws SQLException {
         String sql = "SELECT * FROM branches";
+        List<Branch> branches = new ArrayList<>();
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
-            List<Branch> branches = new ArrayList<>();
             while (rs.next()) {
                 Branch branch = new Branch(rs.getString("id"),
                         rs.getString("branch_name"),
