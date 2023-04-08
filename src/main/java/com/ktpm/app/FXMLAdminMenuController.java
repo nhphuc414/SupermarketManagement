@@ -20,7 +20,8 @@ import javafx.scene.control.ButtonType;
  * @author ad
  */
 public class FXMLAdminMenuController implements Initializable {
-
+    
+    
     @FXML
     void handleSignOut(ActionEvent event) throws IOException {
         Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);

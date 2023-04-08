@@ -54,7 +54,7 @@ public class FXMLLoginController implements Initializable {
                 if (employee.getEmployeeRole() == Employee.EmployeeRole.Manager) {
                     App.setRoot("FXMLAdminMenu","Admin");
                 } else if (employee.getEmployeeRole() == Employee.EmployeeRole.Employee) {
-                    App.setRoot("FXMLEmployeeMenu","Admin");
+                    App.setRoot("FXMLEmployeeMenu","Employee");
                 }
             } else {
                 Alert alert = Utils.getBox("Lỗi", "Đăng nhập không hợp lệ", "Tài khoản hoặc mật khẩu không chính xác", Alert.AlertType.ERROR);

@@ -114,4 +114,9 @@ public class Product {
     public void setProductType(ProductType productType) {
         this.productType = productType;
     }
+    
+    @Override
+    public String toString() {
+        return productName + " (" + origin + ")";
+    }
 }

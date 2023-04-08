@@ -16,7 +16,6 @@ public class App extends Application {
 
     private static Scene scene;
     private static Employee currentEmployee;
-
     public static Employee getCurrentEmployee() {
         return currentEmployee;
     }

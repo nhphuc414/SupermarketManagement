@@ -24,9 +24,9 @@ public interface BranchProductService {
     
     List<BranchProduct> getBranchProductsByProductId(String productId) throws SQLException;
 
-    List<BranchProduct> getBranchProductsByBrandId(String brandId) throws SQLException;
+    List<BranchProduct> getBranchProductsByBranchId(String branchId) throws SQLException;
 
-    List<BranchProduct> getBranchProductsByBrandIdAndProductId(String brandId, String productId) throws SQLException;
+    List<BranchProduct> getBranchProductsByBranchIdAndProductId(String branchId, String productId) throws SQLException;
 
     List<BranchProduct> getAllBranchProducts() throws SQLException;
 

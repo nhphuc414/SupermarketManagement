@@ -22,25 +22,25 @@ public class BranchProductServiceImpl implements BranchProductService {
 
     @Override
     public void addBranchProduct(BranchProduct branchProduct) throws SQLException {
-        String sql = "INSERT INTO branch_products (id, quantity, product_id, brand_id) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO branch_products (id, quantity, product_id, branch_id) VALUES (?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branchProduct.getId());
             pstmt.setDouble(2, branchProduct.getQuantity());
             pstmt.setString(3, branchProduct.getProductId());
-            pstmt.setString(4, branchProduct.getBrandId());
+            pstmt.setString(4, branchProduct.getBranchId());
             pstmt.executeUpdate();
         }
     }
 
     @Override
     public void updateBranchProduct(BranchProduct branchProduct) throws SQLException {
-        String sql = "UPDATE branch_products SET quantity=?, product_id=?, brand_id=? WHERE id=?";
+        String sql = "UPDATE branch_products SET quantity=?, product_id=?, branch_id=? WHERE id=?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setDouble(1, branchProduct.getQuantity());
             pstmt.setString(2, branchProduct.getProductId());
-            pstmt.setString(3, branchProduct.getBrandId());
+            pstmt.setString(3, branchProduct.getBranchId());
             pstmt.setString(4, branchProduct.getId());
             pstmt.executeUpdate();
         }
@@ -68,7 +68,7 @@ public class BranchProductServiceImpl implements BranchProductService {
                 branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
                         rs.getString("product_id"),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
             }
         }
         return branchProduct;
@@ -86,7 +86,7 @@ public class BranchProductServiceImpl implements BranchProductService {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
                         rs.getString("product_id"),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }
         }
@@ -94,18 +94,18 @@ public class BranchProductServiceImpl implements BranchProductService {
     }
 
     @Override
-    public List<BranchProduct> getBranchProductsByBrandId(String brandId) throws SQLException {
-        String sql = "SELECT * FROM branch_products WHERE brand_id=?";
+    public List<BranchProduct> getBranchProductsByBranchId(String branchId) throws SQLException {
+        String sql = "SELECT * FROM branch_products WHERE branch_id=?";
         List<BranchProduct> branchProducts = new ArrayList<>();
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, brandId);
+            pstmt.setString(1, branchId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
                         rs.getString("product_id"),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }
         }
@@ -114,19 +114,19 @@ public class BranchProductServiceImpl implements BranchProductService {
 
     
     @Override
-    public List<BranchProduct> getBranchProductsByBrandIdAndProductId(String brandId, String productId) throws SQLException {
-        String sql = "SELECT * FROM branch_products WHERE brand_id=? AND product_id=?";
+    public List<BranchProduct> getBranchProductsByBranchIdAndProductId(String branchId, String productId) throws SQLException {
+        String sql = "SELECT * FROM branch_products WHERE branch_id=? AND product_id=?";
         List<BranchProduct> branchProducts = new ArrayList<>();
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, brandId);
+            pstmt.setString(1, branchId);
             pstmt.setString(2, productId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
                         rs.getString("product_id"),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }
         }
@@ -144,7 +144,7 @@ public class BranchProductServiceImpl implements BranchProductService {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
                         rs.getString("product_id"),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }
         }
