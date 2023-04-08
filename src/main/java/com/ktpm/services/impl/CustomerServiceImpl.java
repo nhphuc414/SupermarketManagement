@@ -28,7 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
             pstmt.setString(1, customer.getId());
             pstmt.setString(2, customer.getCustomerName());
             pstmt.setString(3, customer.getNumber());
-            pstmt.setDate(4, new java.sql.Date(customer.getBirthday().getTime()));
+            pstmt.setDate(4, customer.getBirthday());
             pstmt.executeUpdate();
         }
     }
@@ -40,7 +40,7 @@ public class CustomerServiceImpl implements CustomerService {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, customer.getCustomerName());
             pstmt.setString(2, customer.getNumber());
-            pstmt.setDate(3, new java.sql.Date(customer.getBirthday().getTime()));
+            pstmt.setDate(3, customer.getBirthday());
             pstmt.setString(4, customer.getId());
             pstmt.executeUpdate();
         }

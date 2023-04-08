@@ -23,6 +23,8 @@ public interface OrderDetailService {
     OrderDetail getOrderDetailById(String id) throws SQLException;
 
     List<OrderDetail> getOrderDetailsByOrderId(String orderId) throws SQLException;
+    
+    List<OrderDetail> getOrderDetailsByProductId(String productId) throws SQLException;
 
     List<OrderDetail> getAllOrderDetails() throws SQLException;
 

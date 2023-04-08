@@ -27,9 +27,13 @@ public class FXMLAdminMenuController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             App.setCurrentEmployee(null);
-            App.setRoot("FXMLLogin");
+            App.setRoot("FXMLLogin","Login");
         }
     }
+    @FXML
+    void handleBranchManager(ActionEvent event) throws IOException{
+        App.setRoot("FXMLBranchManager", "Branch Manager");
+    } 
     /**
      * Initializes the controller class.
      */

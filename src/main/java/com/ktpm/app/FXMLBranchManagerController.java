@@ -13,16 +13,20 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 
 /**
  * FXML Controller class
@@ -30,21 +34,35 @@ import javafx.scene.input.MouseEvent;
  * @author ad
  */
 public class FXMLBranchManagerController implements Initializable {
-    
+
     @FXML
-    private TableView tableView;
+    private TableView tableBranch;
+    
+    
     @FXML
     private TextField txtAddress;
     
+
     @FXML
     private TextField txtName;
-    
+
+    @FXML
+    private Label lbName;
 
     /**
      * Initializes the controller class.
      *
      * @throws java.sql.SQLException
      */
+    public void loadTableColums() throws SQLException{
+        BranchService branchService = new BranchServiceImpl();
+        ObservableList<Branch> brancherTableData = FXCollections.observableArrayList();
+        List<Branch> branches = branchService.getAllBranches();
+        for (Branch branch : branches) {
+            brancherTableData.add(new Branch(branch.getId(), branch.getBranchName(), branch.getAddress()));
+        }
+        
+    }
     public void loadBranches() throws SQLException {
         BranchService branchService = new BranchServiceImpl();
         ObservableList<Branch> brancherTableData = FXCollections.observableArrayList();
@@ -56,28 +74,30 @@ public class FXMLBranchManagerController implements Initializable {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("branchName"));
         TableColumn<Branch, String> addressColumn = new TableColumn<>("Address");
         addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
-        tableView.getColumns().addAll(nameColumn, addressColumn);
-        tableView.setItems(brancherTableData);
+        tableBranch.getColumns().addAll(nameColumn, addressColumn);
+        tableBranch.setItems(brancherTableData);
     }
 
     public void loadOnField(MouseEvent event) {
-        Branch selectedBranch = (Branch) tableView.getSelectionModel().getSelectedItem();
+        Branch selectedBranch = (Branch) tableBranch.getSelectionModel().getSelectedItem();
         if (selectedBranch != null) {
             txtName.setText(selectedBranch.getBranchName());
             txtAddress.setText(selectedBranch.getAddress());
-            
+
             // ...
         }
-        
+
     }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         try {
             // TODO
             loadBranches();
+            lbName.setText(App.getCurrentEmployee().getEmployeeName());
         } catch (SQLException ex) {
             Logger.getLogger(FXMLBranchManagerController.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }    
-    
+    }
+
 }

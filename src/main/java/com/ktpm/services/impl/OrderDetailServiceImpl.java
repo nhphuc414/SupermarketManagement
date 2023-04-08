@@ -97,6 +97,26 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
+    public List<OrderDetail> getOrderDetailsByProductId(String productId) throws SQLException {
+        String sql = "SELECT * FROM order_detail WHERE order_id=?";
+        List<OrderDetail> orderDetails = new ArrayList<>();
+        try (Connection conn = JDBCUtils.getConn()) {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, productId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                OrderDetail orderDetail = new OrderDetail(
+                        rs.getString("id"),
+                        rs.getDouble("quantity"),
+                        rs.getString("product_id"),
+                        rs.getString("order_id"));
+                orderDetails.add(orderDetail);
+            }
+        }
+        return orderDetails;
+    }
+
+    @Override
     public List<OrderDetail> getAllOrderDetails() throws SQLException {
         String sql = "SELECT * FROM order_details";
         List<OrderDetail> orderDetails = new ArrayList<>();
@@ -114,5 +134,4 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         }
         return orderDetails;
     }
-
 }

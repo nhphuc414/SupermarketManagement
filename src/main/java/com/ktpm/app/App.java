@@ -29,18 +29,23 @@ public class App extends Application {
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("FXMLLogin"));
         stage.setScene(scene);
-        stage.setTitle("My App");
-        stage.setResizable(true);
+        stage.setTitle("Login");
+        stage.setResizable(false);
         stage.setOnCloseRequest(eh -> {
             eh.consume();
             Utils.confirmExit();
         });
+        stage.sizeToScene();
         stage.centerOnScreen();
         stage.show();
     }
 
-    static void setRoot(String fxml) throws IOException {
+    static void setRoot(String fxml,String title) throws IOException {
         scene.setRoot(loadFXML(fxml));
+        Stage currentStage = (Stage) scene.getWindow();
+        currentStage.sizeToScene();
+        currentStage.setTitle(title);
+        currentStage.centerOnScreen();
     }
 
     private static Parent loadFXML(String fxml) throws IOException {

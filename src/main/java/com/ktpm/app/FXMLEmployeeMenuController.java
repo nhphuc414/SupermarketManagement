@@ -28,7 +28,7 @@ public class FXMLEmployeeMenuController implements Initializable {
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             App.setCurrentEmployee(null);
-            App.setRoot("FXMLLogin");
+            App.setRoot("FXMLLogin","Login");
         }
     }
     /**

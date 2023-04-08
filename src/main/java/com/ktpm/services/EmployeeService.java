@@ -21,6 +21,8 @@ public interface EmployeeService {
     void deleteEmployee(String id) throws SQLException;
 
     Employee getEmployeeById(String id) throws SQLException;
+    
+    List<Employee> getEmployeesByBranchId(String branchId) throws SQLException;
 
     Employee getEmployeeByUsernameAndPassword(String username, String password) throws SQLException;
 

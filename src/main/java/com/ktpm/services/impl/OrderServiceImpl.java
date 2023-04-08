@@ -12,7 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 /**
@@ -27,7 +27,7 @@ public class OrderServiceImpl implements OrderService {
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, order.getId());
-            pstmt.setDate(2, new java.sql.Date(order.getOrderDate().getTime()));
+            pstmt.setDate(2, order.getOrderDate());
             pstmt.setDouble(3, order.getCashReceived());
             pstmt.setString(4, order.getEmployeeId());
             pstmt.setString(5, order.getCustomerId());
@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService {
         String sql = "UPDATE orders SET order_date = ?, cash_received = ?, employee_id = ?, customer_id = ? WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setDate(1, new java.sql.Date(order.getOrderDate().getTime()));
+            pstmt.setDate(1, order.getOrderDate());
             pstmt.setDouble(2, order.getCashReceived());
             pstmt.setString(3, order.getEmployeeId());
             pstmt.setString(4, order.getCustomerId());

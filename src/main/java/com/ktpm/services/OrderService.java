@@ -6,7 +6,7 @@ package com.ktpm.services;
 
 import com.ktpm.pojo.Order;
 import java.sql.SQLException;
-import java.util.Date;
+import java.sql.Date;
 import java.util.List;
 
 /**

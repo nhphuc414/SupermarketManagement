@@ -4,7 +4,7 @@
  */
 package com.ktpm.pojo;
 
-import java.util.Date;
+import java.sql.Date;
 import java.util.UUID;
 
 /**
@@ -21,7 +21,7 @@ public class Employee {
     private String username;
     private String password;
     private EmployeeRole employeeRole;
-    private String brandId;
+    private String branchId;
 
     public enum EmployeeRole {
         Manager,
@@ -32,7 +32,7 @@ public class Employee {
         this.id=UUID.randomUUID().toString();
     }
 
-    public Employee(String employeeName, String number, Date birthday, Date joinDate, String username, String password, EmployeeRole employeeRole, String brandId) {
+    public Employee(String employeeName, String number, Date birthday, Date joinDate, String username, String password, EmployeeRole employeeRole, String branchId) {
         this();
         this.employeeName = employeeName;
         this.number = number;
@@ -41,10 +41,10 @@ public class Employee {
         this.username = username;
         this.password = password;
         this.employeeRole = employeeRole;
-        this.brandId = brandId;
+        this.branchId = branchId;
     }
     
-    public Employee(String id, String employeeName, String number, Date birthday, Date joinDate, String username, String password, EmployeeRole employeeRole, String brandId) {
+    public Employee(String id, String employeeName, String number, Date birthday, Date joinDate, String username, String password, EmployeeRole employeeRole, String branchId) {
         this.id = id;
         this.employeeName = employeeName;
         this.number = number;
@@ -53,7 +53,7 @@ public class Employee {
         this.username = username;
         this.password = password;
         this.employeeRole = employeeRole;
-        this.brandId = brandId;
+        this.branchId = branchId;
     }
     
     /**
@@ -169,16 +169,16 @@ public class Employee {
     }
 
     /**
-     * @return the brandId
+     * @return the branchId
      */
-    public String getBrandId() {
-        return brandId;
+    public String getBranchId() {
+        return branchId;
     }
 
     /**
-     * @param brandId the brandId to set
+     * @param branchId the branchId to set
      */
-    public void setBrandId(String brandId) {
-        this.brandId = brandId;
+    public void setBranchId(String branchId) {
+        this.branchId = branchId;
     }
 }

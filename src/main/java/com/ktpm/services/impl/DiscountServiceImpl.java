@@ -26,8 +26,8 @@ public class DiscountServiceImpl implements DiscountService {
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, discount.getId());
-            pstmt.setDate(2, new java.sql.Date(discount.getStartDate().getTime()));
-            pstmt.setDate(3, new java.sql.Date(discount.getEndDate().getTime()));
+            pstmt.setDate(2, discount.getStartDate());
+            pstmt.setDate(3, discount.getEndDate());
             pstmt.setDouble(4, discount.getDiscountPercent());
             pstmt.setString(5, discount.getProductId());
             pstmt.executeUpdate();
@@ -39,8 +39,8 @@ public class DiscountServiceImpl implements DiscountService {
         String sql = "UPDATE discounts SET start_date = ?, end_date = ?, discount_percent = ?, product_id = ? WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setDate(1, new java.sql.Date(discount.getStartDate().getTime()));
-            pstmt.setDate(2, new java.sql.Date(discount.getEndDate().getTime()));
+            pstmt.setDate(1, discount.getStartDate());
+            pstmt.setDate(2, discount.getEndDate());
             pstmt.setDouble(3, discount.getDiscountPercent());
             pstmt.setString(4, discount.getProductId());
             pstmt.setString(5, discount.getId());
