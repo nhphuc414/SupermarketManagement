@@ -15,28 +15,28 @@ public class Order {
 
     private String id;
     private Date orderDate;
-    private double cash_received;
-    private String customerId;
+    private double cashReceived;
     private String employeeId;
+    private String customerId;
 
     public Order() {
         id = UUID.randomUUID().toString();
     }
 
-    public Order(Date orderDate, double cash_received, String customerId, String employeeId) {
+    public Order(Date orderDate, double cashReceived, String employeeId, String customerId) {
         this();
         this.orderDate = orderDate;
-        this.cash_received = cash_received;
-        this.customerId = customerId;
+        this.cashReceived = cashReceived;
         this.employeeId = employeeId;
+        this.customerId = customerId;
     }
 
-    public Order(String id, Date orderDate, double cash_received, String customerId, String employeeId) {
+    public Order(String id, Date orderDate, double cashReceived, String employeeId, String customerId) {
         this.id = id;
         this.orderDate = orderDate;
-        this.cash_received = cash_received;
-        this.customerId = customerId;
+        this.cashReceived = cashReceived;
         this.employeeId = employeeId;
+        this.customerId = customerId;
     }
 
     /**
@@ -68,31 +68,17 @@ public class Order {
     }
 
     /**
-     * @return the cash_received
+     * @return the cashReceived
      */
-    public double getCash_received() {
-        return cash_received;
+    public double getCashReceived() {
+        return cashReceived;
     }
 
     /**
-     * @param cash_received the cash_received to set
+     * @param cashReceived the cashReceived to set
      */
-    public void setCash_received(double cash_received) {
-        this.cash_received = cash_received;
-    }
-
-    /**
-     * @return the customerId
-     */
-    public String getCustomerId() {
-        return customerId;
-    }
-
-    /**
-     * @param customerId the customerId to set
-     */
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
+    public void setCashReceived(double cashReceived) {
+        this.cashReceived = cashReceived;
     }
 
     /**
@@ -109,4 +95,18 @@ public class Order {
         this.employeeId = employeeId;
     }
 
+    /**
+     * @return the customerId
+     */
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    /**
+     * @param customerId the customerId to set
+     */
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
+    }
+    
 }

@@ -14,25 +14,26 @@ public class BranchProduct {
 
     private String id;
     private double quantity;
-    private String brandId;
     private String productId;
+    private String brandId;
+    
 
     public BranchProduct() {
         id = UUID.randomUUID().toString();
     }
 
-    public BranchProduct(double quantity, String brandId, String productId) {
+    public BranchProduct(double quantity, String productId, String brandId) {
         this();
         this.quantity = quantity;
-        this.brandId = brandId;
         this.productId = productId;
+        this.brandId = brandId;
     }
 
-    public BranchProduct(String id, double quantity, String brandId, String productId) {
+    public BranchProduct(String id, double quantity, String productId, String brandId) {
         this.id = id;
         this.quantity = quantity;
-        this.brandId = brandId;
         this.productId = productId;
+        this.brandId = brandId;
     }
 
     /**
@@ -50,31 +51,17 @@ public class BranchProduct {
     }
 
     /**
-     * @return the quantityPerUnit
+     * @return the quantity
      */
     public double getQuantity() {
         return quantity;
     }
 
     /**
-     * @param quantity
+     * @param quantity the quantity to set
      */
     public void setQuantity(double quantity) {
         this.quantity = quantity;
-    }
-
-    /**
-     * @return the brandId
-     */
-    public String getBrandId() {
-        return brandId;
-    }
-
-    /**
-     * @param brandId the brandId to set
-     */
-    public void setBrandId(String brandId) {
-        this.brandId = brandId;
     }
 
     /**
@@ -91,4 +78,19 @@ public class BranchProduct {
         this.productId = productId;
     }
 
+    /**
+     * @return the brandId
+     */
+    public String getBrandId() {
+        return brandId;
+    }
+
+    /**
+     * @param brandId the brandId to set
+     */
+    public void setBrandId(String brandId) {
+        this.brandId = brandId;
+    }
+
+   
 }
