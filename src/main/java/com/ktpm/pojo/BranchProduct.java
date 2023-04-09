@@ -14,7 +14,7 @@ public class BranchProduct {
 
     private String id;
     private double quantity;
-    private String productId;
+    private int productId;
     private String branchId;
     
 
@@ -22,14 +22,14 @@ public class BranchProduct {
         id = UUID.randomUUID().toString();
     }
 
-    public BranchProduct(double quantity, String productId, String branchId) {
+    public BranchProduct(double quantity, int productId, String branchId) {
         this();
         this.quantity = quantity;
         this.productId = productId;
         this.branchId = branchId;
     }
 
-    public BranchProduct(String id, double quantity, String productId, String branchId) {
+    public BranchProduct(String id, double quantity, int productId, String branchId) {
         this.id = id;
         this.quantity = quantity;
         this.productId = productId;
@@ -67,14 +67,14 @@ public class BranchProduct {
     /**
      * @return the productId
      */
-    public String getProductId() {
+    public int getProductId() {
         return productId;
     }
 
     /**
      * @param productId the productId to set
      */
-    public void setProductId(String productId) {
+    public void setProductId(int productId) {
         this.productId = productId;
     }
 

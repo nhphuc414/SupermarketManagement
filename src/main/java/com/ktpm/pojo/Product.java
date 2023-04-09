@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 public class Product {
 
-    private String id;
+    private int id;
     private String productName;
     private double price;
     private String origin;
@@ -21,10 +21,6 @@ public class Product {
     public enum ProductType {
         Quantity,
         Weight
-    }
-
-    {
-        id = UUID.randomUUID().toString();
     }
 
     public Product() {
@@ -37,7 +33,7 @@ public class Product {
         this.productType = productType;
     }
 
-    public Product(String id, String productName, double price, String origin, ProductType productType) {
+    public Product(int id, String productName, double price, String origin, ProductType productType) {
         this.id = id;
         this.productName = productName;
         this.price = price;
@@ -48,14 +44,14 @@ public class Product {
     /**
      * @return the id
      */
-    public String getId() {
+    public int getId() {
         return id;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

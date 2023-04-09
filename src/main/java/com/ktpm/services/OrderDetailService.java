@@ -24,7 +24,7 @@ public interface OrderDetailService {
 
     List<OrderDetail> getOrderDetailsByOrderId(String orderId) throws SQLException;
     
-    List<OrderDetail> getOrderDetailsByProductId(String productId) throws SQLException;
+    List<OrderDetail> getOrderDetailsByProductId(int productId) throws SQLException;
 
     List<OrderDetail> getAllOrderDetails() throws SQLException;
 

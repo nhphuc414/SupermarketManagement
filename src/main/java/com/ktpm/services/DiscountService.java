@@ -17,11 +17,11 @@ public interface DiscountService {
 
     void updateDiscount(Discount discount) throws SQLException;
 
-    void deleteDiscount(String id) throws SQLException;
+    void deleteDiscount(int id) throws SQLException;
 
-    Discount getDiscountById(String id) throws SQLException;
+    Discount getDiscountById(int id) throws SQLException;
     
-    List<Discount> getDiscountsByProductId(String productId) throws SQLException;
+    List<Discount> getDiscountsByProductId(int productId) throws SQLException;
      
     List<Discount> getAllDiscounts()throws SQLException;
 }

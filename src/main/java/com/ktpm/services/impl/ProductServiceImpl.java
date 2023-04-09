@@ -25,7 +25,7 @@ public class ProductServiceImpl implements ProductService {
         String sql = "INSERT INTO products (id, product_name, price, origin, product_type) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, product.getId());
+            pstmt.setInt(1, product.getId());
             pstmt.setString(2, product.getProductName());
             pstmt.setDouble(3, product.getPrice());
             pstmt.setString(4, product.getOrigin());
@@ -43,31 +43,31 @@ public class ProductServiceImpl implements ProductService {
             pstmt.setDouble(2, product.getPrice());
             pstmt.setString(3, product.getOrigin());
             pstmt.setString(4, product.getProductType().toString());
-            pstmt.setString(5, product.getId());
+            pstmt.setInt(5, product.getId());
             pstmt.executeUpdate();
         }
     }
 
     @Override
-    public void deleteProduct(String id) throws SQLException {
+    public void deleteProduct(int id) throws SQLException {
         String sql = "DELETE FROM products WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, id);
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
         }
     }
 
     @Override
-    public Product getProductById(String id) throws SQLException {
+    public Product getProductById(int id) throws SQLException {
         String sql = "SELECT * FROM products WHERE id = ?";
         Product product = null;
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, id);
+            pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
             if (rs.next()){
-                product = new Product(rs.getString("id"),
+                product = new Product(rs.getInt("id"),
                 rs.getString("product_name"),
                 rs.getDouble("price"),
                 rs.getString("origin"),
@@ -85,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()){
-            Product  product = new Product(rs.getString("id"),
+            Product  product = new Product(rs.getInt("id"),
                 rs.getString("product_name"),
                 rs.getDouble("price"),
                 rs.getString("origin"),

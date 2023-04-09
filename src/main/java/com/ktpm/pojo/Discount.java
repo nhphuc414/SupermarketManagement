@@ -13,25 +13,23 @@ import java.util.UUID;
  */
 public class Discount {
 
-    private String id;
+    private int id;
     private Date startDate;
     private Date endDate;
     private double discountPercent;
-    private String productId;
+    private int productId;
 
     public Discount() {
-        this.id = UUID.randomUUID().toString();
     }
 
-    public Discount(Date startDate, Date endDate, double discountPercent, String productId) {
-        this();
+    public Discount(Date startDate, Date endDate, double discountPercent, int productId) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.discountPercent = discountPercent;
         this.productId = productId;
     }
 
-    public Discount(String id, Date startDate, Date endDate, double discountPercent, String productId) {
+    public Discount(int id, Date startDate, Date endDate, double discountPercent, int productId) {
         this.id = id;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -42,14 +40,14 @@ public class Discount {
     /**
      * @return the id
      */
-    public String getId() {
+    public int getId() {
         return id;
     }
 
     /**
      * @param id the id to set
      */
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -98,14 +96,14 @@ public class Discount {
     /**
      * @return the productId
      */
-    public String getProductId() {
+    public int getProductId() {
         return productId;
     }
 
     /**
      * @param productId the productId to set
      */
-    public void setProductId(String productId) {
+    public void setProductId(int productId) {
         this.productId = productId;
     }
 

@@ -13,7 +13,7 @@ import java.util.UUID;
 public class OrderDetail {
     private String id;
     private double quantity;
-    private String productId;
+    private int productId;
     private String orderId;
     
    
@@ -21,14 +21,14 @@ public class OrderDetail {
         this.id=UUID.randomUUID().toString();
     }
 
-    public OrderDetail(double quantity, String productId, String orderId) {
+    public OrderDetail(double quantity, int productId, String orderId) {
         this();
         this.quantity = quantity;
         this.productId = productId;
         this.orderId = orderId;
     }
 
-    public OrderDetail(String id, double quantity, String productId, String orderId) {
+    public OrderDetail(String id, double quantity, int productId, String orderId) {
         this.id = id;
         this.quantity = quantity;
         this.productId = productId;
@@ -66,14 +66,14 @@ public class OrderDetail {
     /**
      * @return the productId
      */
-    public String getProductId() {
+    public int getProductId() {
         return productId;
     }
 
     /**
      * @param productId the productId to set
      */
-    public void setProductId(String productId) {
+    public void setProductId(int productId) {
         this.productId = productId;
     }
 

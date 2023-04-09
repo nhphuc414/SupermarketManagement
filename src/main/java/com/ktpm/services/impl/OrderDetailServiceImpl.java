@@ -28,7 +28,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, orderDetail.getId());
             pstmt.setDouble(2, orderDetail.getQuantity());
-            pstmt.setString(3, orderDetail.getProductId());
+            pstmt.setInt(3, orderDetail.getProductId());
             pstmt.setString(4, orderDetail.getOrderId());
             pstmt.executeUpdate();
         }
@@ -40,7 +40,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setDouble(1, orderDetail.getQuantity());
-            pstmt.setString(2, orderDetail.getProductId());
+            pstmt.setInt(2, orderDetail.getProductId());
             pstmt.setString(3, orderDetail.getOrderId());
             pstmt.setString(4, orderDetail.getId());
             pstmt.executeUpdate();
@@ -69,7 +69,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 orderDetail = new OrderDetail(
                         rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("order_id"));
             }
         }
@@ -88,7 +88,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 OrderDetail orderDetail = new OrderDetail(
                         rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("order_id"));
                 orderDetails.add(orderDetail);
             }
@@ -97,18 +97,18 @@ public class OrderDetailServiceImpl implements OrderDetailService {
     }
 
     @Override
-    public List<OrderDetail> getOrderDetailsByProductId(String productId) throws SQLException {
+    public List<OrderDetail> getOrderDetailsByProductId(int productId) throws SQLException {
         String sql = "SELECT * FROM order_detail WHERE order_id=?";
         List<OrderDetail> orderDetails = new ArrayList<>();
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, productId);
+            pstmt.setInt(1, productId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 OrderDetail orderDetail = new OrderDetail(
                         rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("order_id"));
                 orderDetails.add(orderDetail);
             }
@@ -127,7 +127,7 @@ public class OrderDetailServiceImpl implements OrderDetailService {
                 OrderDetail orderDetail = new OrderDetail(
                         rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("order_id"));
                 orderDetails.add(orderDetail);
             }

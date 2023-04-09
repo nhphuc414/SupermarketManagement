@@ -27,7 +27,7 @@ public class BranchProductServiceImpl implements BranchProductService {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branchProduct.getId());
             pstmt.setDouble(2, branchProduct.getQuantity());
-            pstmt.setString(3, branchProduct.getProductId());
+            pstmt.setInt(3, branchProduct.getProductId());
             pstmt.setString(4, branchProduct.getBranchId());
             pstmt.executeUpdate();
         }
@@ -39,7 +39,7 @@ public class BranchProductServiceImpl implements BranchProductService {
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setDouble(1, branchProduct.getQuantity());
-            pstmt.setString(2, branchProduct.getProductId());
+            pstmt.setInt(2, branchProduct.getProductId());
             pstmt.setString(3, branchProduct.getBranchId());
             pstmt.setString(4, branchProduct.getId());
             pstmt.executeUpdate();
@@ -67,7 +67,7 @@ public class BranchProductServiceImpl implements BranchProductService {
             if (rs.next()) {
                 branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("branch_id"));
             }
         }
@@ -75,17 +75,17 @@ public class BranchProductServiceImpl implements BranchProductService {
     }
     
     @Override
-    public List<BranchProduct> getBranchProductsByProductId(String productId) throws SQLException {
+    public List<BranchProduct> getBranchProductsByProductId(int productId) throws SQLException {
         String sql = "SELECT * FROM branch_products WHERE product_id=?";
         List<BranchProduct> branchProducts = new ArrayList<>();
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, productId);
+            pstmt.setInt(1, productId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }
@@ -104,7 +104,7 @@ public class BranchProductServiceImpl implements BranchProductService {
             while (rs.next()) {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }
@@ -114,18 +114,18 @@ public class BranchProductServiceImpl implements BranchProductService {
 
     
     @Override
-    public List<BranchProduct> getBranchProductsByBranchIdAndProductId(String branchId, String productId) throws SQLException {
+    public List<BranchProduct> getBranchProductsByBranchIdAndProductId(String branchId, int productId) throws SQLException {
         String sql = "SELECT * FROM branch_products WHERE branch_id=? AND product_id=?";
         List<BranchProduct> branchProducts = new ArrayList<>();
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branchId);
-            pstmt.setString(2, productId);
+            pstmt.setInt(2, productId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }
@@ -143,7 +143,7 @@ public class BranchProductServiceImpl implements BranchProductService {
             while (rs.next()) {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
                         rs.getDouble("quantity"),
-                        rs.getString("product_id"),
+                        rs.getInt("product_id"),
                         rs.getString("branch_id"));
                 branchProducts.add(branchProduct);
             }

@@ -22,8 +22,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void addEmployee(Employee employee) throws SQLException {
-        String sql = "INSERT INTO employees(id, employee_name, number, birthday, join_date, username, password, employee_role, "
-                + "_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO employees(id, employee_name, number, birthday, join_date, username, password, employee_role, branch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, employee.getId());

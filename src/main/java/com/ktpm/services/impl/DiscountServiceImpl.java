@@ -25,11 +25,11 @@ public class DiscountServiceImpl implements DiscountService {
         String sql = "INSERT INTO discounts (id, start_date, end_date, discount_percent, product_id) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, discount.getId());
+            pstmt.setInt(1, discount.getId());
             pstmt.setDate(2, discount.getStartDate());
             pstmt.setDate(3, discount.getEndDate());
             pstmt.setDouble(4, discount.getDiscountPercent());
-            pstmt.setString(5, discount.getProductId());
+            pstmt.setInt(5, discount.getProductId());
             pstmt.executeUpdate();
         }
     }
@@ -42,54 +42,54 @@ public class DiscountServiceImpl implements DiscountService {
             pstmt.setDate(1, discount.getStartDate());
             pstmt.setDate(2, discount.getEndDate());
             pstmt.setDouble(3, discount.getDiscountPercent());
-            pstmt.setString(4, discount.getProductId());
-            pstmt.setString(5, discount.getId());
+            pstmt.setInt(4, discount.getProductId());
+            pstmt.setInt(5, discount.getId());
             pstmt.executeUpdate();
         }
     }
 
     @Override
-    public void deleteDiscount(String id) throws SQLException {
+    public void deleteDiscount(int id) throws SQLException {
         String sql = "DELETE FROM discounts WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, id);
+            pstmt.setInt(1, id);
             pstmt.executeUpdate();
         }
     }
 
     @Override
-    public Discount getDiscountById(String id) throws SQLException {
+    public Discount getDiscountById(int id) throws SQLException {
         String sql = "SELECT * FROM discounts WHERE id = ?";
         Discount discount = null;
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
              if (rs.next()) {
-                 discount = new Discount(rs.getString("id"),
+                 discount = new Discount(rs.getInt("id"),
                  rs.getDate("start_date"),
                  rs.getDate("end_date"),
                  rs.getDouble("discount_percent"),
-                 rs.getString("product_id"));
+                 rs.getInt("product_id"));
              }
         }
         return discount;
     }
 
     @Override
-    public List<Discount> getDiscountsByProductId(String productId) throws SQLException {
+    public List<Discount> getDiscountsByProductId(int productId) throws SQLException {
         String sql = "SELECT * FROM discounts WHERE product_id = ?";
         List<Discount> discounts = new ArrayList<>();
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, productId);
+            pstmt.setInt(1, productId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()){
-                Discount discount = new Discount(rs.getString("id"),
+                Discount discount = new Discount(rs.getInt("id"),
                  rs.getDate("start_date"),
                  rs.getDate("end_date"),
                  rs.getDouble("discount_percent"),
-                 rs.getString("product_id"));
+                 rs.getInt("product_id"));
                 discounts.add(discount);
             }
         }
@@ -104,11 +104,11 @@ public class DiscountServiceImpl implements DiscountService {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()){
-                Discount discount = new Discount(rs.getString("id"),
+                Discount discount = new Discount(rs.getInt("id"),
                  rs.getDate("start_date"),
                  rs.getDate("end_date"),
                  rs.getDouble("discount_percent"),
-                 rs.getString("product_id"));
+                 rs.getInt("product_id"));
                 discounts.add(discount);
             }
         }
