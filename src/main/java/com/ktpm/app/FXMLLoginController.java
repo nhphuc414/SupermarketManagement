@@ -52,9 +52,9 @@ public class FXMLLoginController implements Initializable {
             if (employee != null) {
                 App.setCurrentEmployee(employee);
                 if (employee.getEmployeeRole() == Employee.EmployeeRole.Manager) {
-                    App.setRoot("FXMLAdminMenu");
+                    App.setRoot("FXMLAdminMenu","Admin");
                 } else if (employee.getEmployeeRole() == Employee.EmployeeRole.Employee) {
-                    App.setRoot("FXMLEmployeeMenu");
+                    App.setRoot("FXMLEmployeeMenu","Employee");
                 }
             } else {
                 Alert alert = Utils.getBox("Lỗi", "Đăng nhập không hợp lệ", "Tài khoản hoặc mật khẩu không chính xác", Alert.AlertType.ERROR);

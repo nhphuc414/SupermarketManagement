@@ -45,11 +45,11 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
-    public void deleteBranch(Branch branch) throws SQLException {
+    public void deleteBranch(String id) throws SQLException {
         String sql = "DELETE FROM branches WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, branch.getId());
+            pstmt.setString(1, id);
             pstmt.executeUpdate();
         }
     }

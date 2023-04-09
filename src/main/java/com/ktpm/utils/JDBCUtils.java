@@ -23,9 +23,12 @@ public class JDBCUtils {
             Logger.getLogger(JDBCUtils.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
     public static Connection getConn() throws SQLException {
         // B2 Thiet lap ket noi
         return DriverManager.getConnection("jdbc:mysql://localhost/supermarket", "root", "Admin@123");
+    }
+     public static Connection getTestConn() throws SQLException {
+        // B2 Thiet lap ket noi
+        return DriverManager.getConnection("jdbc:mysql://localhost/testdb", "root", "Admin@123");
     }
 }

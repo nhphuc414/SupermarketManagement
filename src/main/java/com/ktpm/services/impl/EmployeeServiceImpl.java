@@ -22,35 +22,35 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public void addEmployee(Employee employee) throws SQLException {
-        String sql = "INSERT INTO employees(id, employee_name, number, birthday, join_date, username, password, employee_role, brand_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO employees(id, employee_name, number, birthday, join_date, username, password, employee_role, branch_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, employee.getId());
             pstmt.setString(2, employee.getEmployeeName());
             pstmt.setString(3, employee.getNumber());
-            pstmt.setDate(4, new java.sql.Date(employee.getBirthday().getTime()));
-            pstmt.setDate(5, new java.sql.Date(employee.getJoinDate().getTime()));
+            pstmt.setDate(4, employee.getBirthday());
+            pstmt.setDate(5, employee.getJoinDate());
             pstmt.setString(6, employee.getUsername());
             pstmt.setString(7, employee.getPassword());
             pstmt.setString(8, employee.getEmployeeRole().toString());
-            pstmt.setString(9, employee.getBrandId());
+            pstmt.setString(9, employee.getBranchId());
             pstmt.executeUpdate();
         }
     }
 
     @Override
     public void updateEmployee(Employee employee) throws SQLException {
-        String sql = "UPDATE employees SET employee_name = ?, number = ?, birthday = ?, join_date = ?, username = ?, password = ?, employee_role = ?, brand_id = ? WHERE id = ?";
+        String sql = "UPDATE employees SET employee_name = ?, number = ?, birthday = ?, join_date = ?, username = ?, password = ?, employee_role = ?, branch_id = ? WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, employee.getEmployeeName());
             pstmt.setString(2, employee.getNumber());
-            pstmt.setDate(3, new java.sql.Date(employee.getBirthday().getTime()));
-            pstmt.setDate(4, new java.sql.Date(employee.getJoinDate().getTime()));
+            pstmt.setDate(3,employee.getBirthday());
+            pstmt.setDate(4, employee.getJoinDate());
             pstmt.setString(5, employee.getUsername());
             pstmt.setString(6, employee.getPassword());
             pstmt.setString(7, employee.getEmployeeRole().toString());
-            pstmt.setString(8, employee.getBrandId());
+            pstmt.setString(8, employee.getBranchId());
             pstmt.setString(9, employee.getId());
             pstmt.executeUpdate();
         }
@@ -83,7 +83,7 @@ public class EmployeeServiceImpl implements EmployeeService {
                         rs.getString("username"),
                         rs.getString("password"),
                         Employee.EmployeeRole.valueOf(rs.getString("employee_role")),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
             }
         }
         return employee;
@@ -107,12 +107,36 @@ public class EmployeeServiceImpl implements EmployeeService {
                         rs.getString("username"),
                         rs.getString("password"),
                         Employee.EmployeeRole.valueOf(rs.getString("employee_role")),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
             }
         }
         return employee;
     }
-
+    
+    @Override
+    public List<Employee> getEmployeesByBranchId(String branchId) throws SQLException {
+        String sql = "SELECT * FROM employees WHERE branch_id=?";
+        try (Connection conn = JDBCUtils.getConn()) {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, branchId);
+            ResultSet rs = pstmt.executeQuery();
+            List<Employee> employees = new ArrayList<>();
+            while (rs.next()) {
+                Employee employee = new Employee(rs.getString("id"),
+                        rs.getString("employee_name"),
+                        rs.getString("number"),
+                        rs.getDate("birthday"),
+                        rs.getDate("join_date"),
+                        rs.getString("username"),
+                        rs.getString("password"),
+                        Employee.EmployeeRole.valueOf(rs.getString("employee_role")),
+                        rs.getString("branch_id"));
+                employees.add(employee);
+            }
+            return employees;
+        }
+    }
+    
     @Override
     public List<Employee> getAllEmployees() throws SQLException {
         String sql = "SELECT * FROM employees";
@@ -129,11 +153,10 @@ public class EmployeeServiceImpl implements EmployeeService {
                         rs.getString("username"),
                         rs.getString("password"),
                         Employee.EmployeeRole.valueOf(rs.getString("employee_role")),
-                        rs.getString("brand_id"));
+                        rs.getString("branch_id"));
                 employees.add(employee);
             }
             return employees;
         }
     }
-
 }

@@ -3,7 +3,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
 package com.ktpm.services;
-
 import com.ktpm.pojo.Branch;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,7 +17,7 @@ public interface BranchService {
 
     public void updateBranch(Branch branch) throws SQLException;
 
-    public void deleteBranch(Branch branch) throws SQLException;
+    public void deleteBranch(String id) throws SQLException;
 
     public Branch getBranchById(String id) throws SQLException;
 
