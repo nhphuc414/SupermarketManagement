@@ -34,7 +34,12 @@ public class BranchServiceTest {
     
     @BeforeAll
     public static void setUpClass() throws SQLException {
-            conn = JDBCUtils.getTestConn();
+        try {
+            conn = JDBCUtils.getConn();
+        } catch (SQLException ex) {
+            Logger.getLogger(BranchServiceTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     @AfterAll
     public static void tearDownClass() {
@@ -76,12 +81,10 @@ public class BranchServiceTest {
         branch.setBranchName("Test Branch");
         branch.setAddress("123 Test St");
         branchService.addBranch(branch);
-
         // Update the branch's information
         branch.setBranchName("Updated Branch Name");
         branch.setAddress("456 Updated St");
         branchService.updateBranch(branch);
-
         // Verify that the branch was updated correctly by retrieving it from the database
         Branch retrievedBranch = branchService.getBranchById("test2");
         assertNotNull(retrievedBranch);
@@ -91,28 +94,25 @@ public class BranchServiceTest {
 
     @Test
     public void testDeleteBranch() throws Exception {
-        String id = "test2";
-        branchService.deleteBranch(id);
+        branchService.deleteBranch("test2");
+         branchService.deleteBranch("test1");
+        Branch retrievedBranch = branchService.getBranchById("test2");
+        assertNull(retrievedBranch);
+        
     }
 
     @Test
     public void testGetBranchById() throws Exception {
         // Retrieve the branch from the database and verify that it was retrieved correctly
-        Branch retrievedBranch = branchService.getBranchById("test1");
+        Branch retrievedBranch = branchService.getBranchById("1");
         assertNotNull(retrievedBranch);
-        assertEquals("Test Branch", retrievedBranch.getBranchName());
-        assertEquals("123 Test St", retrievedBranch.getAddress());
-        branchService.deleteBranch("test1");
+        assertEquals("Trụ sở", retrievedBranch.getBranchName());
+        assertEquals("06 Lê Lợi, Gò Vấp, TP. HCM", retrievedBranch.getAddress());
     }
-//    @Test
-//    public void testGetAllBranches() throws Exception {
-//        List<Branch> branches = branchService.getAllBranches();
-//        assertEquals(2, branches.size());
-//        assertEquals("test1", branches.get(0).getId());
-//        assertEquals("Branch 1", branches.get(0).getBranchName());
-//        assertEquals("Address 1", branches.get(0).getAddress());
-//        assertEquals("test2", branches.get(1).getId());
-//        assertEquals("Updated Branch Name", branches.get(1).getBranchName());
-//        assertEquals("456 Updated St", branches.get(1).getAddress());
-//    }
+    @Test
+    public void testGetAllBranches() throws Exception {
+        List<Branch> branches = branchService.getAllBranches();
+        assertEquals("1", branches.get(0).getId());
+        assertEquals("Trụ sở", branches.get(0).getBranchName());
+    }
 }
