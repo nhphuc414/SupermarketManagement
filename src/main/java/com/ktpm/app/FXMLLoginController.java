@@ -68,7 +68,6 @@ public class FXMLLoginController implements Initializable {
             alert.showAndWait();
         }
     }
-
     /**
      * Initializes the controller class.
      *

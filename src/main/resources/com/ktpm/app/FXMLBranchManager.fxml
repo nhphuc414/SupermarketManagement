@@ -13,37 +13,38 @@
         <URL value="@/styles/fxmlbranchmanager.css" />
     </stylesheets>
    <children>
+      <AnchorPane layoutY="120.0" prefHeight="580.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="780.0" AnchorPane.topAnchor="120.0">
+         <children>
+            <Label layoutX="20.0" layoutY="142.0" text="Tên chi nhánh">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField fx:id="textFieldName" layoutX="186.0" layoutY="136.0" prefHeight="25.0" prefWidth="300.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+            <Button fx:id="btnAdd" layoutX="398.0" layoutY="290.0" mnemonicParsing="false" onAction="#addBranch" prefHeight="39.0" prefWidth="88.0" text="Thêm " AnchorPane.bottomAnchor="251.0" AnchorPane.rightAnchor="14.0" />
+            <Button layoutX="163.0" layoutY="350.0" mnemonicParsing="false" onAction="#returnMain" prefHeight="39.0" prefWidth="88.0" text="Trở về" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <Label layoutX="20.0" layoutY="211.0" text="Địa chỉ">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <TextField fx:id="textFieldAddress" layoutX="186.0" layoutY="205.0" prefHeight="39.0" prefWidth="300.0">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </TextField>
+         </children>
+      </AnchorPane>
       <AnchorPane id="AnchorPane" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="580.0" prefWidth="780.0" styleClass="mainFxmlClass" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
          <stylesheets>
             <URL value="@/styles/fxmlbranchmanager.css" />
          </stylesheets>
          <children>
             <TableView fx:id="tableBranch" layoutX="157.0" layoutY="79.0" prefHeight="580.0" prefWidth="780.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-         </children>
-      </AnchorPane>
-      <AnchorPane layoutY="120.0" prefHeight="580.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="780.0" AnchorPane.topAnchor="120.0">
-         <children>
-            <Label layoutX="20.0" layoutY="78.0" text="Tên chi nhánh">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <TextField fx:id="txtName" layoutX="144.0" layoutY="72.0" prefHeight="25.0" prefWidth="300.0">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </TextField>
-            <Label layoutX="20.0" layoutY="150.0" text="Địa chỉ">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </Label>
-            <TextField fx:id="txtAddress" layoutX="144.0" layoutY="144.0" prefHeight="100.0" prefWidth="300.0">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </TextField>
-            <Button layoutX="163.0" layoutY="350.0" mnemonicParsing="false" prefHeight="39.0" prefWidth="88.0" text="Trở về" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="250.0" layoutY="7.0" prefHeight="120.0" prefWidth="1280.0" AnchorPane.bottomAnchor="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />

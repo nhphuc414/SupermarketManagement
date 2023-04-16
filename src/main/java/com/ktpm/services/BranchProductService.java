@@ -22,11 +22,11 @@ public interface BranchProductService {
 
     BranchProduct getBranchProductById(String id) throws SQLException;
     
+    BranchProduct getBranchProductsByBranchIdAndProductId(String branchId, int productId) throws SQLException;
+    
     List<BranchProduct> getBranchProductsByProductId(int productId) throws SQLException;
 
     List<BranchProduct> getBranchProductsByBranchId(String branchId) throws SQLException;
-
-    List<BranchProduct> getBranchProductsByBranchIdAndProductId(String branchId, int productId) throws SQLException;
 
     List<BranchProduct> getAllBranchProducts() throws SQLException;
 

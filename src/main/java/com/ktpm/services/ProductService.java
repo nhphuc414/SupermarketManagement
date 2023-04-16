@@ -13,13 +13,15 @@ import java.util.List;
  * @author ad
  */
 public interface ProductService {
-    void addProduct(Product product) throws SQLException;
+    int addProduct(Product product) throws SQLException;
 
     void updateProduct(Product product) throws SQLException;
 
     void deleteProduct(int id) throws SQLException;
 
     Product getProductById(int id) throws SQLException;
+    
+    Product getProductByName(String productName) throws SQLException;
 
     List<Product> getAllProducts() throws SQLException;
 }

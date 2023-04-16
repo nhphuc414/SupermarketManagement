@@ -73,6 +73,25 @@ public class BranchProductServiceImpl implements BranchProductService {
         }
         return branchProduct;
     }
+    @Override
+    public BranchProduct getBranchProductsByBranchIdAndProductId(String branchId, int productId) throws SQLException {
+        String sql = "SELECT * FROM branch_products WHERE branch_id=? AND product_id=?";
+        BranchProduct branchProduct=null;
+        try (Connection conn = JDBCUtils.getConn()) {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, branchId);
+            pstmt.setInt(2, productId);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                branchProduct=new BranchProduct(rs.getString("id"),
+                        rs.getDouble("quantity"),
+                        rs.getInt("product_id"),
+                        rs.getString("branch_id"));
+            }
+        }
+        return branchProduct;
+    }
+
     
     @Override
     public List<BranchProduct> getBranchProductsByProductId(int productId) throws SQLException {
@@ -100,27 +119,6 @@ public class BranchProductServiceImpl implements BranchProductService {
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, branchId);
-            ResultSet rs = pstmt.executeQuery();
-            while (rs.next()) {
-                BranchProduct branchProduct=new BranchProduct(rs.getString("id"),
-                        rs.getDouble("quantity"),
-                        rs.getInt("product_id"),
-                        rs.getString("branch_id"));
-                branchProducts.add(branchProduct);
-            }
-        }
-        return branchProducts;
-    }
-
-    
-    @Override
-    public List<BranchProduct> getBranchProductsByBranchIdAndProductId(String branchId, int productId) throws SQLException {
-        String sql = "SELECT * FROM branch_products WHERE branch_id=? AND product_id=?";
-        List<BranchProduct> branchProducts = new ArrayList<>();
-        try (Connection conn = JDBCUtils.getConn()) {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, branchId);
-            pstmt.setInt(2, productId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 BranchProduct branchProduct=new BranchProduct(rs.getString("id"),

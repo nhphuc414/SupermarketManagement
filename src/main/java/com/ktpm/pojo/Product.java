@@ -113,6 +113,6 @@ public class Product {
     
     @Override
     public String toString() {
-        return productName + " (" + origin + ")";
+        return id + " " + productName + " (" + origin + ")";
     }
 }

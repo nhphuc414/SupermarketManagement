@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,19 +22,22 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
 
     @Override
-    public void addProduct(Product product) throws SQLException {
-        String sql = "INSERT INTO products (id, product_name, price, origin, product_type) VALUES (?, ?, ?, ?, ?)";
+    public int addProduct(Product product) throws SQLException {
+        String sql = "INSERT INTO products ( product_name, price, origin, product_type) VALUES (?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, product.getId());
-            pstmt.setString(2, product.getProductName());
-            pstmt.setDouble(3, product.getPrice());
-            pstmt.setString(4, product.getOrigin());
-            pstmt.setString(5, product.getProductType().toString());
+            PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            pstmt.setString(1, product.getProductName());
+            pstmt.setDouble(2, product.getPrice());
+            pstmt.setString(3, product.getOrigin());
+            pstmt.setString(4, product.getProductType().toString());
             pstmt.executeUpdate();
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
         }
+        return 0;
     }
-
     @Override
     public void updateProduct(Product product) throws SQLException {
         String sql = "UPDATE products SET product_name = ?, price = ?, origin = ?, product_type = ? WHERE id = ?";
@@ -66,12 +70,31 @@ public class ProductServiceImpl implements ProductService {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 product = new Product(rs.getInt("id"),
-                rs.getString("product_name"),
-                rs.getDouble("price"),
-                rs.getString("origin"),
-                Product.ProductType.valueOf(rs.getString("product_type")));
+                        rs.getString("product_name"),
+                        rs.getDouble("price"),
+                        rs.getString("origin"),
+                        Product.ProductType.valueOf(rs.getString("product_type")));
+            }
+        }
+        return product;
+    }
+
+    @Override
+    public Product getProductByName(String productName) throws SQLException {
+        String sql = "SELECT * FROM products WHERE product_name = ?";
+        Product product = null;
+        try (Connection conn = JDBCUtils.getConn()) {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, productName);
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                product = new Product(rs.getInt("id"),
+                        rs.getString("product_name"),
+                        rs.getDouble("price"),
+                        rs.getString("origin"),
+                        Product.ProductType.valueOf(rs.getString("product_type")));
             }
         }
         return product;
@@ -84,16 +107,15 @@ public class ProductServiceImpl implements ProductService {
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             ResultSet rs = pstmt.executeQuery();
-            while (rs.next()){
-            Product  product = new Product(rs.getInt("id"),
-                rs.getString("product_name"),
-                rs.getDouble("price"),
-                rs.getString("origin"),
-                Product.ProductType.valueOf(rs.getString("product_type")));
-            products.add(product);
-        }
+            while (rs.next()) {
+                Product product = new Product(rs.getInt("id"),
+                        rs.getString("product_name"),
+                        rs.getDouble("price"),
+                        rs.getString("origin"),
+                        Product.ProductType.valueOf(rs.getString("product_type")));
+                products.add(product);
+            }
         }
         return products;
     }
-
 }

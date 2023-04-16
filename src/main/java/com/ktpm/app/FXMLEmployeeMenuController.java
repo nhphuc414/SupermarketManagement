@@ -7,6 +7,8 @@ package com.ktpm.app;
 import com.ktpm.pojo.Branch;
 import com.ktpm.pojo.BranchProduct;
 import com.ktpm.pojo.Employee;
+import com.ktpm.pojo.Order;
+import com.ktpm.pojo.OrderDetail;
 import com.ktpm.pojo.Product;
 import com.ktpm.services.BranchProductService;
 import com.ktpm.services.ProductService;
@@ -27,9 +29,14 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import org.controlsfx.control.SearchableComboBox;
+import org.controlsfx.control.textfield.CustomTextField;
 
 /**
  * FXML Controller class
@@ -37,47 +44,72 @@ import javafx.scene.control.Label;
  * @author ad
  */
 public class FXMLEmployeeMenuController implements Initializable {
+
     private Branch branch = null;
-    private List<Product> products = new ArrayList<>(); 
+    private Order order = null;
+    private ObservableList<Product> products = FXCollections.observableArrayList();
+    private ObservableList<OrderDetail> orderdetails = FXCollections.observableArrayList();
     private List<BranchProduct> branchProducts = new ArrayList<>();
-    @FXML
-    private ComboBox<Product> cbProduct;
-    @FXML
-    private Label lbBranch;
+    private Product currentProduct = null;
 
     @FXML
-    private Label lbName;
-    
-    void onLoad(){
+    private TableView<?> tbvOrderDetail;
+
+    @FXML
+    private SearchableComboBox<Product> cbProductName;
+
+    @FXML
+    private CustomTextField custxtQuantity;
+
+    void addOrderDetails(ActionEvent event) {
+        OrderDetail orderdetail = new OrderDetail(Double.parseDouble(custxtQuantity.getText()),
+                currentProduct.getId(),
+                order.getId());
+        orderdetails.add(orderdetail);
+    }
+
+    void onLoad() {
         try {
-            ProductService productService = new ProductServiceImpl();
-            BranchProductService branchProductService = new BranchProductServiceImpl();
             BranchServiceImpl branchService = new BranchServiceImpl();
-            branch= branchService.getBranchById(App.getCurrentEmployee().getBranchId());
-            branchProducts = branchProductService.getBranchProductsByBranchId(branch.getId());
-            for (BranchProduct bp: branchProducts){
-                products.add(productService.getProductById(bp.getProductId()));
-            }
-             ObservableList<Product> productList = FXCollections.observableArrayList();
-             productList.addAll(products);
-             cbProduct.setItems(productList);
-             lbName.setText(App.getCurrentEmployee().getUsername());
-             lbName.setText(branch.getAddress());
-        } catch (SQLException e){
+            branch = branchService.getBranchById(App.getCurrentEmployee().getBranchId());
+            loadProduct();
+        } catch (SQLException e) {
             Alert alert = Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", e.getMessage(), Alert.AlertType.ERROR);
             alert.showAndWait();
         }
     }
+
+    void loadProduct() throws SQLException {
+        ProductService productService = new ProductServiceImpl();
+        BranchProductService branchProductService = new BranchProductServiceImpl();
+        order = new Order();
+        order.setEmployeeId(App.getCurrentEmployee().getId());
+        products.clear();
+        orderdetails.clear();
+        branchProducts = branchProductService.getBranchProductsByBranchId(branch.getId());
+        for (BranchProduct bp : branchProducts) {
+            if (bp.getQuantity() != 0) {
+                products.add(productService.getProductById(bp.getProductId()));
+            }
+        }
+        cbProductName.setItems(products);
+    }
+
+    @FXML
+    void onChoose(ActionEvent event) {
+        currentProduct = cbProductName.getValue();
+    }
+
     @FXML
     void handleSignOut(ActionEvent event) throws IOException {
         Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             App.setCurrentEmployee(null);
-            App.setRoot("FXMLLogin","Login");
+            App.setRoot("FXMLLogin", "Login");
         }
     }
-    
+
     /**
      * Initializes the controller class.
      */
@@ -85,6 +117,5 @@ public class FXMLEmployeeMenuController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
         onLoad();
-    }    
-    
+    }
 }
