@@ -33,7 +33,7 @@
                   </Label>
                   <TextField fx:id="txtUsername" layoutX="80.0" layoutY="223.0" prefHeight="35.0" prefWidth="200.0" promptText="Username" styleClass="text-field" />
                   <PasswordField fx:id="txtPassword" layoutX="81.0" layoutY="279.0" prefHeight="35.0" prefWidth="200.0" promptText="Password" styleClass="text-field" />
-                  <Button fx:id="btnLogin" layoutX="139.0" layoutY="340.0" mnemonicParsing="false" onAction="#loginAccount" prefHeight="35.0" prefWidth="83.0" styleClass="login-button" text="Login" />
+                  <Button layoutX="139.0" layoutY="340.0" mnemonicParsing="false" onAction="#loginAccount" prefHeight="35.0" prefWidth="83.0" styleClass="login-button" text="Login" />
                </children>
             </AnchorPane>
          </children>

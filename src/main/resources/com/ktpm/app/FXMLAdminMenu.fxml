@@ -12,9 +12,9 @@
    <children>
       <Label layoutX="623.0" layoutY="63.0" text="Admin" />
       <Button layoutX="567.0" layoutY="153.0" mnemonicParsing="false" onAction="#handleBranchManager" prefHeight="57.0" prefWidth="147.0" text="Quản lý chi nhánh" />
-      <Button layoutX="567.0" layoutY="285.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="147.0" text="Quản lý nhân viên" />
-      <Button layoutX="567.0" layoutY="396.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="147.0" text="Quản lý hàng hóa" />
-      <Button layoutX="14.0" layoutY="661.0" mnemonicParsing="false" onAction="#handleSignOut" text="Sign out" />
+      <Button layoutX="567.0" layoutY="285.0" mnemonicParsing="false" onAction="#handleEmployeeManager" prefHeight="57.0" prefWidth="147.0" text="Quản lý nhân viên" />
+      <Button layoutX="567.0" layoutY="396.0" mnemonicParsing="false" onAction="#handleProductManager" prefHeight="57.0" prefWidth="147.0" text="Quản lý hàng hóa" />
       <Button layoutX="566.0" layoutY="512.0" mnemonicParsing="false" prefHeight="57.0" prefWidth="147.0" text="Quản lý khách hàng" />
+      <Button layoutX="60.0" layoutY="604.0" mnemonicParsing="false" onAction="#handleSignOut" prefHeight="40.0" prefWidth="69.0" text="Sign out" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
    </children>
 </AnchorPane>

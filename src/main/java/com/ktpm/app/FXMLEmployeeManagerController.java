@@ -19,8 +19,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -80,8 +78,8 @@ public class FXMLEmployeeManagerController implements Initializable {
 
     final private BranchService branchService = new BranchServiceImpl();
     final private EmployeeService employeeService = new EmployeeServiceImpl();
-    private ObservableList<Employee> employeeTableData = FXCollections.observableArrayList();
-    private ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
+    private final ObservableList<Employee> employeeTableData = FXCollections.observableArrayList();
+    private final ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller class.
@@ -91,40 +89,19 @@ public class FXMLEmployeeManagerController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        try {
             onLoad();
-            // TODO
-        } catch (SQLException ex) {
-            Logger.getLogger(FXMLEmployeeManagerController.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    public void returnMain(ActionEvent event) {
+        try {
+            App.setRoot("FXMLAdminMenu", " Manager");
+        } catch (IOException io) {
+            Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
         }
     }
 
-    @FXML
-    public void returnMain(ActionEvent event) throws IOException {
-        App.setRoot("FXMLAdminMenu", " Manager");
-    }
-
-    public void loadBranchAndRole() throws SQLException {
-        List<Branch> branches = branchService.getAllBranches();
-        for (Branch branch : branches) {
-            branchTableData.add(new Branch(branch.getId(), branch.getBranchName(), branch.getAddress()));
-        }
-        comboBoxBranch.setItems(branchTableData);
-        comboBoxBranch.setValue(branchTableData.get(0));
-        comboboxRole.getItems().addAll(Employee.EmployeeRole.Employee, Employee.EmployeeRole.Manager);
-        comboboxRole.setValue(Employee.EmployeeRole.Employee);
-    }
-
-    public void loadEmployee() throws SQLException {
-        List<Employee> employees = employeeService.getAllEmployees();
-        for (Employee employee : employees) {
-            employeeTableData.add(employee);
-        }
-    }
-
-    public void onLoad() throws SQLException {
-        loadBranchAndRole();
-        loadEmployee();
+    public void loadColumns() {
+        //Load Collumn
         TableColumn<Employee, ?> nameColumn = new TableColumn<>("Họ tên");
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("employeeName"));
 
@@ -146,75 +123,39 @@ public class FXMLEmployeeManagerController implements Initializable {
         TableColumn<Employee, ?> branchColumn = new TableColumn<>("Chi nhánh");
         branchColumn.setCellValueFactory(new PropertyValueFactory<>("branchId"));
         tableEmployee.getColumns().addAll(nameColumn, numberColumn, dateColumn, joinColumn, usernameColumn, roleColumn, branchColumn);
-        tableEmployee.setItems(employeeTableData);
 
         TableColumn<Employee, Void> actionColumn = new TableColumn<>("Hành động");
         actionColumn.setCellFactory(param -> new ButtonCell());
         actionColumn.setPrefWidth(300);
         tableEmployee.getColumns().add(actionColumn);
+
     }
 
-    public boolean test(String id, Branch branch, String name, String number, LocalDate birthday, String username, String password, String confirmPassword) {
-        if ("".equals(confirmPassword) || "".equals(name) || branch == null || "".equals(number) || "".equals(username) || "".equals(password)) {
-            Alert alert = Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR);
-            textFieldName.requestFocus();
-            textFieldPassword.setText("");
-            textFieldConfirm.setText("");
-            alert.showAndWait();
-        } else if (birthday == null) {
-            Alert alert = Utils.getBox("Lỗi", "Lỗi nhập liệu", "Vui lòng nhập đúng định dạng ngày tháng (MM/dd/yyyy)", Alert.AlertType.ERROR);
-            datePickerBirthday.requestFocus();
-            textFieldPassword.setText("");
-            textFieldConfirm.setText("");
-            alert.showAndWait();
-        } else if (username.contains(" ")) {
-            Alert alert = Utils.getBox("Lỗi", "Lỗi nhập liệu", "username không nên có khoảng trắng", Alert.AlertType.ERROR);
-            textFieldUsername.requestFocus();
-            textFieldPassword.setText("");
-            textFieldConfirm.setText("");
-            alert.showAndWait();
-        } else if (!number.matches("[0-9]+")) {
-            Alert alert = Utils.getBox("Lỗi", "Lỗi nhập liệu", "Lỗi nhập SDT", Alert.AlertType.ERROR);
-            textFieldNumber.requestFocus();
-            textFieldPassword.setText("");
-            textFieldConfirm.setText("");
-            alert.showAndWait();
-        } else if (employeeTableData.
-                stream().anyMatch(e -> !e.getId().equals(id) && e.getUsername().equals(username))) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Lỗi");
-            alert.setHeaderText("Tài khoản đã có người sử dụng");
-            alert.showAndWait();
-            textFieldPassword.setText("");
-            textFieldConfirm.setText("");
-            textFieldName.requestFocus();
-        } else if (employeeTableData.stream().anyMatch(e
-                -> !e.getId().equals(id)
-                && (e.getEmployeeName().equalsIgnoreCase(name)
-                && e.getBirthday().equals(Date.valueOf(birthday))
-                && e.getNumber().equals(number))
-        )) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Lỗi");
-            alert.setHeaderText("Đã có nhân viên này");
-            alert.showAndWait();
-            textFieldPassword.setText("");
-            textFieldConfirm.setText("");
-            textFieldName.requestFocus();
-        } else if (!password.equals(confirmPassword)) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Nhập sai");
-            alert.setHeaderText("Mật khẩu không trùng");
-            alert.showAndWait();
-            textFieldPassword.setText("");
-            textFieldConfirm.setText("");
-            textFieldNumber.requestFocus();
-        } else {
-            return true;
+    public void onLoad(){
+        loadColumns();
+        //Load role
+        comboboxRole.getItems().addAll(Employee.EmployeeRole.Employee, Employee.EmployeeRole.Manager);
+        comboboxRole.setValue(Employee.EmployeeRole.Employee);
+        try {
+            //Load branches
+            List<Branch> branches = branchService.getAllBranches();
+            for (Branch branch : branches) {
+                branchTableData.add(new Branch(branch.getId(), branch.getBranchName(), branch.getAddress()));
+            }
+            //Load employee
+            List<Employee> employees = employeeService.getAllEmployees();
+            for (Employee employee : employees) {
+                employeeTableData.add(employee);
+            }
+            comboBoxBranch.setItems(branchTableData);
+            comboBoxBranch.setValue(branchTableData.get(0));
+
+            tableEmployee.setItems(employeeTableData);
+        } catch (SQLException ex){
+            Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
         }
-        return false;
     }
-
+    
     public void resetField() {
         comboBoxBranch.setValue(branchTableData.get(0));
         textFieldName.setText("");
@@ -226,7 +167,39 @@ public class FXMLEmployeeManagerController implements Initializable {
         textFieldName.requestFocus();
         btnAdd.setDisable(false);
     }
-    public void addEmployee(ActionEvent event) throws SQLException {
+
+    public void loadOnField(Employee employee) {
+        for (Branch branch : branchTableData) {
+            if (branch.getId().equals(employee.getBranchId())) {
+                comboBoxBranch.setValue(branch);
+                break;
+            }
+        }
+        textFieldName.setText(employee.getEmployeeName());
+        textFieldNumber.setText(employee.getNumber());
+        textFieldUsername.setText(employee.getUsername());
+        textFieldUsername.setEditable(false);
+        datePickerBirthday.setValue(LocalDate.parse(employee.getBirthday().toString()));
+        comboboxRole.setValue(employee.getEmployeeRole());
+    }
+
+    public void getEmployeeInField(Employee employee) {
+        employee.setBranchId(comboBoxBranch.getValue().getId());
+        employee.setEmployeeName(textFieldName.getText().trim());
+        employee.setNumber(textFieldNumber.getText().trim());
+        employee.setBirthday(Date.valueOf(datePickerBirthday.getValue()));
+        employee.setUsername(textFieldUsername.getText().trim());
+        employee.setPassword(textFieldPassword.getText().trim());
+        employee.setEmployeeRole(comboboxRole.getValue());
+    }
+
+    private void resetPassword() {
+        textFieldName.requestFocus();
+        textFieldPassword.setText("");
+        textFieldConfirm.setText("");
+    }
+
+    public boolean checkValid(String id) {
         Branch branch = comboBoxBranch.getValue();
         String name = textFieldName.getText().trim();
         String number = textFieldNumber.getText().trim();
@@ -235,111 +208,134 @@ public class FXMLEmployeeManagerController implements Initializable {
         String password = textFieldPassword.getText().trim();
         String confirmPassword = textFieldConfirm.getText().trim();
         Employee.EmployeeRole role = comboboxRole.getValue();
-        if (test("", branch, name, number, birthday, username, password, confirmPassword)) {
-            Employee employee = new Employee(name, number, Date.valueOf(birthday), Date.valueOf(LocalDate.now()), username, password, role, branch.getId());
-            employeeTableData.add(employee);
-            employeeService.addEmployee(employee);
-            resetField();
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Thêm thành công");
-            alert.setContentText("Thêm thành công");
-            alert.showAndWait();
+        if ("".equals(confirmPassword) || "".equals(name) || branch == null || "".equals(number) || "".equals(username) || "".equals(password)) {
+            Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR).showAndWait();
+            resetPassword();
+        } else if (birthday == null) {
+            Utils.getBox("Lỗi", "Lỗi nhập liệu", "Vui lòng nhập đúng định dạng ngày tháng (MM/dd/yyyy)", Alert.AlertType.ERROR).showAndWait();
+            resetPassword();
+            datePickerBirthday.requestFocus();
+        } else if (username.contains(" ")) {
+            Utils.getBox("Lỗi", "Lỗi nhập liệu", "username không nên có khoảng trắng", Alert.AlertType.ERROR).showAndWait();
+            resetPassword();
+        } else if (!number.matches("[0-9]+")) {
+            Utils.getBox("Lỗi", "Lỗi nhập liệu", "Lỗi nhập SDT", Alert.AlertType.ERROR).showAndWait();
+            resetPassword();
+            textFieldNumber.requestFocus();
+        } else if (employeeTableData.
+                stream().anyMatch(e -> !e.getId().equals(id) && e.getUsername().equals(username))) {
+            Utils.getBox("Lỗi", "Thêm thất bại", "Tài khoản đã có người sử dụng", Alert.AlertType.ERROR).showAndWait();
+            resetPassword();
+        } else if (employeeTableData.stream().anyMatch(e
+                -> !e.getId().equals(id)
+                && (e.getEmployeeName().equalsIgnoreCase(name)
+                && e.getBirthday().equals(Date.valueOf(birthday))
+                && e.getNumber().equals(number))
+        )) {
+            Utils.getBox("Lỗi", "Thêm thất bại", "Đã có nhân viên này", Alert.AlertType.ERROR).showAndWait();
+            resetPassword();
+        } else if (!password.equals(confirmPassword)) {
+            Utils.getBox("Lỗi", "Nhập sai", "Mật khẩu không trùng", Alert.AlertType.ERROR).showAndWait();
+            resetPassword();
+        } else {
+            return true;
         }
+        return false;
+    }
 
+    public void addEmployee(ActionEvent event) {
+        Employee employee = new Employee();
+        if (checkValid("")) {
+            getEmployeeInField(employee);
+            employee.setJoinDate(Date.valueOf(LocalDate.now()));
+            try {
+                employeeService.addEmployee(employee);
+                employeeTableData.add(employee);
+                Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
+                resetField();
+            } catch (SQLException ex) {
+                Utils.getBox("Thất bại", "Có lỗi", "Thêm thất bại", Alert.AlertType.ERROR).showAndWait();
+                textFieldName.requestFocus();
+            }
+
+        }
     }
 
     private class ButtonCell extends TableCell<Employee, Void> {
 
         private final Button editButton = new Button("Sửa");
         private final Button deleteButton = new Button("Xóa");
+        private EventHandler<ActionEvent> originalEditEvent;
+        private EventHandler<ActionEvent> originalDeleteEvent;
 
-        private void setCommit(Employee employee) throws SQLException {
+        private void setButton(Boolean value) {
+            tableEmployee.lookupAll("Button").forEach(node -> {
+                if (node instanceof Button) {
+                    Button button = (Button) node;
+                    button.setDisable(value);
+                }
+            });
+            this.editButton.setDisable(false);
+            this.deleteButton.setDisable(false);
+        }
+
+        private void beforeCommit() {
             editButton.setText("Cập nhật");
             deleteButton.setText("Hủy bỏ");
-            for (Branch branch : branchTableData) {
-                if (branch.getId().equals(employee.getBranchId())) {
-                    comboBoxBranch.setValue(branch);
-                    break;
-                }
-            }
-            textFieldName.setText(employee.getEmployeeName());
-            textFieldNumber.setText(employee.getNumber());
-            textFieldUsername.setText(employee.getUsername());
-            textFieldUsername.setEditable(false);
-            datePickerBirthday.setValue(LocalDate.parse(employee.getBirthday().toString()));
             btnAdd.setDisable(true);
+            setButton(true);
+        }
+
+        private void afterCommitOrCancel() {
+            resetField();
+            setButton(false);
+            btnAdd.setDisable(false);
+            editButton.setText("Sửa");
+            deleteButton.setText("Xóa");
+            editButton.setOnAction(originalEditEvent);
+            deleteButton.setOnAction(originalDeleteEvent);
+            textFieldUsername.setEditable(true);
         }
 
         public ButtonCell() {
             editButton.setOnAction(event -> {
+                beforeCommit();
+                originalEditEvent = editButton.getOnAction();
+                originalDeleteEvent = deleteButton.getOnAction();
                 Employee employee = getTableView().getItems().get(getIndex());
-                try {
-                    setCommit(employee);
-                } catch (SQLException ex) {
-                    Logger.getLogger(FXMLEmployeeManagerController.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                EventHandler<ActionEvent> originalEditEvent = editButton.getOnAction();
-                EventHandler<ActionEvent> originalDeleteEvent = deleteButton.getOnAction();
+                loadOnField(employee);
+
                 deleteButton.setOnAction(cancelEvent -> {
-                    editButton.setText("Sửa");
-                    deleteButton.setText("Xóa");
-                    editButton.setOnAction(originalEditEvent);
-                    deleteButton.setOnAction(originalDeleteEvent);
-                    resetField();
-                    textFieldUsername.setEditable(true);
+                    afterCommitOrCancel();
                 });
+
                 editButton.setOnAction(commitEvent -> {
-                    Branch branch = comboBoxBranch.getValue();
-                    String name = textFieldName.getText().trim();
-                    String number = textFieldNumber.getText().trim();
-                    LocalDate birthday = datePickerBirthday.getValue();
-                    String password = textFieldPassword.getText().trim();
-                    String confirmPassword = textFieldConfirm.getText().trim();
-                    
-                    if (test(employee.getId(), branch, name, number, birthday, employee.getUsername(), password, confirmPassword)) {
+                    if (checkValid(employee.getId())) {
+                        getEmployeeInField(employee);
                         try {
-                            employee.setBranchId(branch.getId());
-                            employee.setEmployeeName(name);
-                            employee.setNumber(number);
-                            employee.setBirthday(Date.valueOf(birthday));
-                            employee.setPassword(password);
-                            employee.setEmployeeRole(comboboxRole.getValue());
                             employeeService.updateEmployee(employee);
                             tableEmployee.refresh();
-                            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                            alert.setTitle("Cập nhật thành công");
-                            alert.setContentText("Cập nhật thành công");
-                            alert.showAndWait();
+                            Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
+                            afterCommitOrCancel();
                         } catch (SQLException ex) {
-                            Logger.getLogger(FXMLEmployeeManagerController.class.getName()).log(Level.SEVERE, null, ex);
+                            Utils.getBox("Sửa thất bại", "Không sửa được", "Có lỗi với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
+                            textFieldName.requestFocus();
                         }
-                        editButton.setText("Sửa");
-                        deleteButton.setText("Xóa");
-                        editButton.setOnAction(originalEditEvent);
-                        deleteButton.setOnAction(originalDeleteEvent);
-                        resetField();
-                        textFieldUsername.setEditable(true);
                     }
-
                 });
             });
+
             deleteButton.setOnAction(event -> {
                 Employee employee = getTableView().getItems().get(getIndex());
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-                alert.setTitle("Xác nhận xóa");
-                alert.setHeaderText("Bạn có chắc chắn muốn xóa?");
-                alert.setContentText(employee.getEmployeeName() + " sẽ bị xóa vĩnh viễn.");
+                Alert alert = Utils.getBox("Xác nhận xóa", "Bạn có chắc chắn muốn xóa?", employee.getEmployeeName() + " sẽ bị xóa vĩnh viễn.", Alert.AlertType.CONFIRMATION);
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     try {
                         employeeService.deleteEmployee(employee.getId());
                         employeeTableData.remove(employee);
+                        Utils.getBox("Thành công", "", "Xóa thành công", Alert.AlertType.INFORMATION).showAndWait();
                     } catch (SQLException ex) {
-                        Alert alertSQL = new Alert(Alert.AlertType.ERROR);
-                        alertSQL.setTitle("Xóa thất bại");
-                        alertSQL.setHeaderText("Không thể xóa nhân viên");
-                        alertSQL.setContentText("Lỗi không thể xóa nhân viên");
-                        alertSQL.showAndWait();
+                        Utils.getBox("Xóa thất bại", "", "Lỗi không thể xóa được", Alert.AlertType.ERROR).showAndWait();
                     }
                 }
             });

@@ -26,7 +26,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("FXMLProductManager"));
+        scene = new Scene(loadFXML("FXMLLogin"));
         stage.setScene(scene);
         stage.setTitle("Login");
         stage.setResizable(false);
@@ -38,7 +38,6 @@ public class App extends Application {
         stage.centerOnScreen();
         stage.show();
     }
-
     static void setRoot(String fxml,String title) throws IOException {
         scene.setRoot(loadFXML(fxml));
         Stage currentStage = (Stage) scene.getWindow();
