@@ -4,17 +4,22 @@
  */
 package com.ktpm.app;
 
+import com.ktpm.pojo.Discount;
 import com.ktpm.pojo.Product;
-import com.ktpm.pojo.Product.ProductType;
+import com.ktpm.services.DiscountService;
 import com.ktpm.services.ProductService;
+import com.ktpm.services.impl.DiscountServiceImpl;
 import com.ktpm.services.impl.ProductServiceImpl;
 import com.ktpm.utils.Utils;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Date;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -24,41 +29,44 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import org.controlsfx.control.SearchableComboBox;
 
 /**
  * FXML Controller class
  *
  * @author ad
  */
-public class FXMLProductManagerController implements Initializable {
+public class FXMLDiscountManagerController implements Initializable {
 
     @FXML
     private Button btnAdd;
 
     @FXML
-    private ComboBox<ProductType> comboBoxType;
+    private SearchableComboBox<Product> comboBoxProduct;
 
     @FXML
-    private TableView<Product> tableProduct;
+    private DatePicker datePickerEndDate;
 
     @FXML
-    private TextField textFieldName;
+    private DatePicker datePickerStartDate;
 
     @FXML
-    private TextField textFieldOrigin;
+    private TableView<Discount> tableDiscount;
 
     @FXML
-    private TextField textFieldPrice;
+    private TextField textFieldPercent;
 
-    private final ProductService productService = new ProductServiceImpl();
+    final private ProductService productService = new ProductServiceImpl();
+    final private DiscountService discountService = new DiscountServiceImpl();
     private final ObservableList<Product> productTableData = FXCollections.observableArrayList();
+    private final ObservableList<Discount> discountTableData = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller class.
@@ -77,107 +85,118 @@ public class FXMLProductManagerController implements Initializable {
         } catch (IOException io) {
             Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
         }
-
     }
 
     public void loadColumns() {
-        TableColumn<Product, ?> idColumn = new TableColumn<>("Mã sản phẩm");
+        TableColumn<Discount, ?> idColumn = new TableColumn<>("Mã giảm giá");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        
+        TableColumn<Discount, String> productNameColumn = new TableColumn<>("Sản phẩm");
+        productNameColumn.setCellValueFactory(cellData -> {
+            int productId = cellData.getValue().getProductId();
+            String productName = "";
+            try {
+                productName = productService.getProductById(productId).toString();
+            } catch (SQLException ex) {
+                Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
+            }
+            return new SimpleStringProperty(productName);
+        });
 
-        TableColumn<Product, ?> nameColumn = new TableColumn<>("Tên sản phẩm");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        TableColumn<Discount, ?> startColumn = new TableColumn<>("Ngày bắt đầu");
+        startColumn.setCellValueFactory(new PropertyValueFactory<>("startDate"));
 
-        TableColumn<Product, ?> originColumn = new TableColumn<>("Xuất xứ");
-        originColumn.setCellValueFactory(new PropertyValueFactory<>("origin"));
+        TableColumn<Discount, ?> endColumn = new TableColumn<>("Ngày kết thúc");
+        endColumn.setCellValueFactory(new PropertyValueFactory<>("endDate"));
 
-        TableColumn<Product, ?> priceColumn = new TableColumn<>("Giá");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        TableColumn<Discount, ?> percentColumn = new TableColumn<>("Giảm(%)");
+        percentColumn.setCellValueFactory(new PropertyValueFactory<>("discountPercent"));
 
-        TableColumn<Product, ?> typeColumn = new TableColumn<>("Kiểu định lượng");
-        typeColumn.setCellValueFactory(new PropertyValueFactory<>("productType"));
+        tableDiscount.getColumns().addAll(idColumn,productNameColumn, startColumn, endColumn, percentColumn);
 
-        tableProduct.getColumns().addAll(idColumn, nameColumn, originColumn, priceColumn, typeColumn);
-
-        TableColumn<Product, Void> actionColumn = new TableColumn<>("Hành động");
+        TableColumn<Discount, Void> actionColumn = new TableColumn<>("Hành động");
         actionColumn.setCellFactory(param -> new ButtonCell());
         actionColumn.setPrefWidth(300);
-
-        tableProduct.getColumns().add(actionColumn);
+        tableDiscount.getColumns().add(actionColumn);
     }
 
     public void onLoad() {
         loadColumns();
-        comboBoxType.getItems().addAll(ProductType.Quantity, ProductType.Weight);
-        comboBoxType.setValue(ProductType.Quantity);
         try {
             List<Product> products = productService.getAllProducts();
-            for (Product product : products) {
-                productTableData.add(new Product(product.getId(), product.getProductName(), product.getPrice(), product.getOrigin(), product.getProductType()));
-            }
-            tableProduct.setItems(productTableData);
+            productTableData.addAll(products);
+            comboBoxProduct.setItems(productTableData);
+            comboBoxProduct.setValue(productTableData.get(0));
+            List<Discount> discounts = discountService.getAllDiscounts();
+            discountTableData.addAll(discounts);
+            tableDiscount.setItems(discountTableData);
         } catch (SQLException ex) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
         }
     }
 
     public void resetField() {
-        textFieldName.setText("");
-        textFieldOrigin.setText("");
-        textFieldPrice.setText("");
-        comboBoxType.setValue(ProductType.Quantity);
-        textFieldName.requestFocus();
+        textFieldPercent.setText("");
+        comboBoxProduct.setValue(productTableData.get(0));
+        datePickerStartDate.setValue(null);
+        datePickerEndDate.setValue(null);
+        textFieldPercent.requestFocus();
     }
 
-    public void loadonField(Product product) {
-        textFieldName.setText(product.getProductName());
-        textFieldOrigin.setText(product.getOrigin());
-        textFieldPrice.setText(String.valueOf(product.getPrice()));
-        comboBoxType.setValue(product.getProductType());
-        textFieldName.requestFocus();
+    public void loadOnField(Discount discount) {
+        for (Product product : productTableData) {
+            if (product.getId() == discount.getProductId()) {
+                comboBoxProduct.setValue(product);
+                break;
+            }
+        }
+        datePickerStartDate.setValue(LocalDate.parse(discount.getStartDate().toString()));
+        datePickerEndDate.setValue(LocalDate.parse(discount.getEndDate().toString()));
+        textFieldPercent.setText(String.valueOf(discount.getDiscountPercent()));
+
     }
 
-    public void getProductInField(Product product) {
-        product.setProductName(textFieldName.getText().trim());
-        product.setOrigin(textFieldOrigin.getText().trim());
-        product.setPrice(Double.parseDouble(textFieldPrice.getText().trim()));
-        product.setProductType(comboBoxType.getValue());
+    public void getDiscountInField(Discount discount) {
+        discount.setProductId(comboBoxProduct.getValue().getId());
+        discount.setStartDate(Date.valueOf(datePickerStartDate.getValue()));
+        discount.setEndDate(Date.valueOf(datePickerEndDate.getValue()));
+        discount.setDiscountPercent(Double.parseDouble(textFieldPercent.getText().trim()));
     }
 
     public boolean checkValid(int id) {
-        String name = textFieldName.getText().trim();
-        String origin = textFieldOrigin.getText().trim();
-        String price = textFieldPrice.getText().trim();
-        ProductType type = comboBoxType.getValue();
-        if ("".equals(name) || "".equals(origin) || "".equals(price)) {
+        Product product = comboBoxProduct.getValue();
+        LocalDate startDate = datePickerStartDate.getValue();
+        LocalDate endDate = datePickerEndDate.getValue();
+        String percent = textFieldPercent.getText();
+        if (product == null || "".equals(percent)) {
             Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR).showAndWait();
-            textFieldName.requestFocus();
-        } else if (productTableData.
-                stream().anyMatch(p -> !(p.getId() == id) && (p.getProductName().equals(name) && p.getOrigin().equals(origin)))) {
-            Utils.getBox("Lỗi", "Trùng sản phẩm", "Đã có sản phẩm này", Alert.AlertType.INFORMATION).showAndWait();
-            textFieldName.requestFocus();
+
+        } else if (startDate == null || endDate == null) {
+            Utils.getBox("Lỗi", "Lỗi nhập liệu", "Vui lòng nhập đúng định dạng ngày tháng (MM/dd/yyyy)", Alert.AlertType.ERROR).showAndWait();
+        } else if (discountTableData.stream().anyMatch(d -> !(id == d.getId()) && product.getId() == d.getProductId() && d.getStartDate().equals(Date.valueOf(startDate)) && d.getEndDate().equals(Date.valueOf(endDate)))) {
+            Utils.getBox("Lỗi", "Thêm thất bại", "Đã có giảm giá này", Alert.AlertType.ERROR).showAndWait();
         } else {
             return true;
         }
         return false;
     }
 
-    public void addProduct(ActionEvent event) {
-        Product product = new Product();
+    public void addDiscount(ActionEvent event) {
+        Discount discount = new Discount();
         if (checkValid(0)) {
-            getProductInField(product);
+            getDiscountInField(discount);
             try {
-                product.setId(productService.addProduct(product));
-                productTableData.add(product);
+                discount.setId(discountService.addDiscount(discount));
+                discountTableData.add(discount);
                 Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
                 resetField();
             } catch (SQLException ex) {
                 Utils.getBox("Thất bại", "Có lỗi", "Thêm thất bại", Alert.AlertType.ERROR).showAndWait();
-                textFieldName.requestFocus();
             }
         }
     }
 
-    private class ButtonCell extends TableCell<Product, Void> {
+    private class ButtonCell extends TableCell<Discount, Void> {
 
         private final Button editButton = new Button("Sửa");
         private final Button deleteButton = new Button("Xóa");
@@ -185,7 +204,7 @@ public class FXMLProductManagerController implements Initializable {
         EventHandler<ActionEvent> originalDeleteEvent;
 
         private void setButton(Boolean value) {
-            tableProduct.lookupAll("Button").forEach(node -> {
+            tableDiscount.lookupAll("Button").forEach(node -> {
                 if (node instanceof Button) {
                     Button button = (Button) node;
                     button.setDisable(value);
@@ -194,14 +213,14 @@ public class FXMLProductManagerController implements Initializable {
             this.editButton.setDisable(false);
             this.deleteButton.setDisable(false);
         }
-
+        
         private void beforeCommit() {
             editButton.setText("Cập nhật");
             deleteButton.setText("Hủy bỏ");
             btnAdd.setDisable(true);
             setButton(true);
         }
-
+        
         private void afterCommitOrCancel() {
             resetField();
             setButton(false);
@@ -218,46 +237,45 @@ public class FXMLProductManagerController implements Initializable {
                 beforeCommit();
                 originalEditEvent = editButton.getOnAction();
                 originalDeleteEvent = deleteButton.getOnAction();
-                Product product = getTableView().getItems().get(getIndex());
-                loadonField(product);
+                Discount discount = getTableView().getItems().get(getIndex());
+                loadOnField(discount);
                 deleteButton.setOnAction(cancelEvent -> {
                     afterCommitOrCancel();
                 });
                 editButton.setOnAction(commitEvent -> {
-                    if (checkValid(product.getId())) {
-                        getProductInField(product);
+                    if (checkValid(discount.getId())){
+                        getDiscountInField(discount);
                         try {
-                            productService.updateProduct(product);
-                            tableProduct.refresh();
+                            discountService.updateDiscount(discount);
+                            tableDiscount.refresh();
                             Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
                             afterCommitOrCancel();
                         } catch (SQLException ex) {
                             Utils.getBox("Cập nhật thất bại", "Không thể cập nhật", "Có lỗi với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
-                            textFieldName.requestFocus();
                         }
                     }
                 });
             });
             deleteButton.setOnAction(event -> {
-                Product product = getTableView().getItems().get(getIndex());
-                Alert alert = Utils.getBox("Xác nhận xóa", "Bạn có chắc chắn muốn xóa?", product.getProductName() + " sẽ bị xóa vĩnh viễn.", Alert.AlertType.CONFIRMATION);
+                Discount discount = getTableView().getItems().get(getIndex());
+                Alert alert = Utils.getBox("Xác nhận xóa", "Bạn có chắc chắn muốn xóa?", " Mã sẽ bị xóa vĩnh viễn.", Alert.AlertType.CONFIRMATION);
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
-                    try {
-                        productService.deleteProduct(product.getId());
-                        productTableData.remove(product);
+                    try { 
+                        discountService.deleteDiscount(discount.getId());
+                        discountTableData.remove(discount);
                         Utils.getBox("Thành công", "", "Xóa thành công", Alert.AlertType.INFORMATION).showAndWait();
                     } catch (SQLException ex) {
                         Utils.getBox("Xóa thất bại", "", "Lỗi không thể xóa được", Alert.AlertType.ERROR).showAndWait();
                     }
                 }
             });
-
         }
 
         @Override
         protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);
+
             if (empty) {
                 setGraphic(null);
             } else {
@@ -266,4 +284,5 @@ public class FXMLProductManagerController implements Initializable {
             }
         }
     }
+
 }

@@ -2,40 +2,50 @@
 
 <?import java.net.URL?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.SearchableComboBox?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLBranchManagerController">
-    <stylesheets>
-        <URL value="@/styles/fxmlbranchmanager.css" />
-    </stylesheets>
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLDiscountManagerController">
+   <stylesheets>
+      <URL value="@/styles/fxmlbranchmanager.css" />
+   </stylesheets>
    <children>
       <AnchorPane layoutY="120.0" prefHeight="580.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="780.0" AnchorPane.topAnchor="120.0">
          <children>
-            <Label layoutX="20.0" layoutY="142.0" text="Tên chi nhánh">
+            <Label layoutX="27.0" layoutY="68.0" text="Sản phẩm">
                <font>
                   <Font size="18.0" />
                </font>
             </Label>
-            <Label layoutX="20.0" layoutY="211.0" text="Địa chỉ">
+            <Label layoutX="27.0" layoutY="141.0" text="Ngày bắt đầu">
                <font>
                   <Font size="18.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldName" layoutX="186.0" layoutY="136.0" prefHeight="25.0" prefWidth="300.0">
+            <Label layoutX="27.0" layoutY="218.0" text="Ngày kết thúc">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <Label layoutX="27.0" layoutY="289.0" text="Giảm(%)">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <SearchableComboBox fx:id="comboBoxProduct" layoutX="185.0" layoutY="62.0" prefHeight="39.0" prefWidth="300.0" />
+            <DatePicker fx:id="datePickerStartDate" layoutX="185.0" layoutY="135.0" prefHeight="39.0" prefWidth="300.0" />
+            <DatePicker fx:id="datePickerEndDate" layoutX="185.0" layoutY="212.0" prefHeight="39.0" prefWidth="300.0" />
+            <TextField fx:id="textFieldPercent" layoutX="186.0" layoutY="283.0" prefHeight="39.0" prefWidth="300.0">
                <font>
                   <Font size="18.0" />
                </font>
             </TextField>
-            <TextField fx:id="textFieldAddress" layoutX="186.0" layoutY="205.0" prefHeight="39.0" prefWidth="300.0">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </TextField>
-            <Button fx:id="btnAdd" layoutX="398.0" layoutY="290.0" mnemonicParsing="false" onAction="#addBranch" prefHeight="39.0" prefWidth="88.0" text="Thêm " AnchorPane.bottomAnchor="251.0" AnchorPane.rightAnchor="14.0" />
+            <Button fx:id="btnAdd" layoutX="398.0" layoutY="360.0" mnemonicParsing="false" onAction="#addDiscount" prefHeight="39.0" prefWidth="88.0" text="Thêm " AnchorPane.bottomAnchor="181.0" AnchorPane.rightAnchor="14.0" />
             <Button layoutX="163.0" layoutY="350.0" mnemonicParsing="false" onAction="#returnMain" prefHeight="39.0" prefWidth="88.0" text="Trở về" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
          </children>
       </AnchorPane>
@@ -44,7 +54,7 @@
             <URL value="@/styles/fxmlbranchmanager.css" />
          </stylesheets>
          <children>
-            <TableView fx:id="tableBranch" layoutX="157.0" layoutY="79.0" prefHeight="580.0" prefWidth="780.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TableView fx:id="tableDiscount" layoutX="157.0" layoutY="79.0" prefHeight="580.0" prefWidth="780.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
       <AnchorPane layoutX="250.0" layoutY="7.0" prefHeight="120.0" prefWidth="1280.0" AnchorPane.bottomAnchor="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />

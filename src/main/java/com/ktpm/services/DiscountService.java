@@ -13,7 +13,7 @@ import java.util.List;
  * @author ad
  */
 public interface DiscountService {
-    void addDiscount(Discount discount) throws SQLException;
+    int addDiscount(Discount discount) throws SQLException;
 
     void updateDiscount(Discount discount) throws SQLException;
 

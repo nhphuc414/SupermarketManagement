@@ -324,7 +324,6 @@ public class FXMLEmployeeManagerController implements Initializable {
                     }
                 });
             });
-
             deleteButton.setOnAction(event -> {
                 Employee employee = getTableView().getItems().get(getIndex());
                 Alert alert = Utils.getBox("Xác nhận xóa", "Bạn có chắc chắn muốn xóa?", employee.getEmployeeName() + " sẽ bị xóa vĩnh viễn.", Alert.AlertType.CONFIRMATION);

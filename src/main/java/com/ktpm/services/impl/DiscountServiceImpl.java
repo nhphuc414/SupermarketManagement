@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +22,21 @@ import java.util.List;
 public class DiscountServiceImpl implements DiscountService {
 
     @Override
-    public void addDiscount(Discount discount) throws SQLException {
-        String sql = "INSERT INTO discounts (id, start_date, end_date, discount_percent, product_id) VALUES (?, ?, ?, ?, ?)";
+    public int addDiscount(Discount discount) throws SQLException {
+        String sql = "INSERT INTO discounts (start_date, end_date, discount_percent, product_id) VALUES (?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setInt(1, discount.getId());
-            pstmt.setDate(2, discount.getStartDate());
-            pstmt.setDate(3, discount.getEndDate());
-            pstmt.setDouble(4, discount.getDiscountPercent());
-            pstmt.setInt(5, discount.getProductId());
+            PreparedStatement pstmt = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+            pstmt.setDate(1, discount.getStartDate());
+            pstmt.setDate(2, discount.getEndDate());
+            pstmt.setDouble(3, discount.getDiscountPercent());
+            pstmt.setInt(4, discount.getProductId());
+            ResultSet rs = pstmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
             pstmt.executeUpdate();
         }
+        return 0;
     }
 
     @Override

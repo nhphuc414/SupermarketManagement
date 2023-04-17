@@ -3,26 +3,25 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
  */
 package com.ktpm.app;
-
 import com.ktpm.pojo.Branch;
-import com.ktpm.pojo.BranchProduct;
-import com.ktpm.pojo.Employee;
-import com.ktpm.pojo.Order;
+import com.ktpm.pojo.Discount;
 import com.ktpm.pojo.OrderDetail;
 import com.ktpm.pojo.Product;
 import com.ktpm.services.BranchProductService;
+import com.ktpm.services.BranchService;
+import com.ktpm.services.DiscountService;
 import com.ktpm.services.ProductService;
 import com.ktpm.services.impl.BranchProductServiceImpl;
 import com.ktpm.services.impl.BranchServiceImpl;
+import com.ktpm.services.impl.DiscountServiceImpl;
 import com.ktpm.services.impl.ProductServiceImpl;
 import com.ktpm.utils.Utils;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,12 +30,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import org.controlsfx.control.SearchableComboBox;
-import org.controlsfx.control.textfield.CustomTextField;
 
 /**
  * FXML Controller class
@@ -45,77 +44,92 @@ import org.controlsfx.control.textfield.CustomTextField;
  */
 public class FXMLEmployeeMenuController implements Initializable {
 
-    private Branch branch = null;
-    private Order order = null;
-    private ObservableList<Product> products = FXCollections.observableArrayList();
-    private ObservableList<OrderDetail> orderdetails = FXCollections.observableArrayList();
-    private List<BranchProduct> branchProducts = new ArrayList<>();
-    private Product currentProduct = null;
+    @FXML
+    private Button btnAdd;
 
     @FXML
-    private TableView<?> tbvOrderDetail;
+    private SearchableComboBox<Product> comboBoxProduct;
+
 
     @FXML
-    private SearchableComboBox<Product> cbProductName;
+    private TableView<OrderDetail> tableOrderDetail;
 
     @FXML
-    private CustomTextField custxtQuantity;
-
-    void addOrderDetails(ActionEvent event) {
-        OrderDetail orderdetail = new OrderDetail(Double.parseDouble(custxtQuantity.getText()),
-                currentProduct.getId(),
-                order.getId());
-        orderdetails.add(orderdetail);
-    }
-
-    void onLoad() {
-        try {
-            BranchServiceImpl branchService = new BranchServiceImpl();
-            branch = branchService.getBranchById(App.getCurrentEmployee().getBranchId());
-            loadProduct();
-        } catch (SQLException e) {
-            Alert alert = Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", e.getMessage(), Alert.AlertType.ERROR);
-            alert.showAndWait();
-        }
-    }
-
-    void loadProduct() throws SQLException {
-        ProductService productService = new ProductServiceImpl();
-        BranchProductService branchProductService = new BranchProductServiceImpl();
-        order = new Order();
-        order.setEmployeeId(App.getCurrentEmployee().getId());
-        products.clear();
-        orderdetails.clear();
-        branchProducts = branchProductService.getBranchProductsByBranchId(branch.getId());
-        for (BranchProduct bp : branchProducts) {
-            if (bp.getQuantity() != 0) {
-                products.add(productService.getProductById(bp.getProductId()));
-            }
-        }
-        cbProductName.setItems(products);
-    }
-
-    @FXML
-    void onChoose(ActionEvent event) {
-        currentProduct = cbProductName.getValue();
-    }
-
-    @FXML
-    void handleSignOut(ActionEvent event) throws IOException {
-        Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            App.setCurrentEmployee(null);
-            App.setRoot("FXMLLogin", "Login");
-        }
-    }
+    private TextField textFieldQuantity;
+    
+    final private BranchService branchService = new BranchServiceImpl();
+    final private BranchProductService branchProductService = new BranchProductServiceImpl();
+    final private ProductService productService = new ProductServiceImpl();
+    final private DiscountService discountService = new DiscountServiceImpl();
+    private final ObservableList<Product> productTableData = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller class.
+     *
+     * @param url
+     * @param rb
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
-        onLoad();
+
     }
+
+    public void handleSignOut(ActionEvent event){
+        Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try{
+            App.setCurrentEmployee(null);
+            App.setRoot("FXMLLogin", "Login");
+            } catch (IOException io) {
+            Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
+        }
+        }
+    }
+    
+    public void loadColumns(){
+        TableColumn<OrderDetail, String> productNameColumn = new TableColumn<>("Sản phẩm");
+        productNameColumn.setCellValueFactory(cellData -> {
+            int productId = cellData.getValue().getProductId();
+            String productName = "";
+            try {
+                productName = productService.getProductById(productId).toString();
+            } catch (SQLException ex) {
+                Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
+            }
+            return new SimpleStringProperty(productName);
+        });
+        TableColumn<OrderDetail, String> priceColumn = new TableColumn<>("Giá");
+        priceColumn.setCellValueFactory(cellData -> {
+            int productId = cellData.getValue().getProductId();
+            String price = "";
+            try {
+                price = String.valueOf(productService.getProductById(productId).getPrice());
+            } catch (SQLException ex) {
+                Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
+            }
+            return new SimpleStringProperty(price);
+        });
+        TableColumn<Branch, ?> quantityColumn = new TableColumn<>("Số lượng");
+        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        
+        
+    }
+
+    public void addCustomer(ActionEvent event) {
+
+    }
+
+    public void addOrderDetail(ActionEvent event) {
+
+    }
+
+    public void btnPay(ActionEvent event) {
+
+    }
+
+    public void onChoose(ActionEvent event) {
+        
+    }
+
 }
