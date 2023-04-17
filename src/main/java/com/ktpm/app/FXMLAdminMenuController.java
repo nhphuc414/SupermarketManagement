@@ -57,6 +57,21 @@ public class FXMLAdminMenuController implements Initializable {
             Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
         }
     }
+    
+    public void handleBranchProductManager(ActionEvent event) {
+        try {
+            App.setRoot("FXMLBranchProductManager", "Stock Manager");
+        } catch (IOException io) {
+            Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
+        }
+    }
+     public void handleDiscountManager(ActionEvent event) {
+        try {
+            App.setRoot("FXMLDiscountManager", "Stock Manager");
+        } catch (IOException io) {
+            Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
+        }
+    }
     /**
      * Initializes the controller class.
      * @param url
