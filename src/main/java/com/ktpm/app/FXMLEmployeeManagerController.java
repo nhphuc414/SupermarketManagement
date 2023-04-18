@@ -76,8 +76,8 @@ public class FXMLEmployeeManagerController implements Initializable {
     @FXML
     private TextField textFieldUsername;
 
-    final private BranchService branchService = new BranchServiceImpl();
-    final private EmployeeService employeeService = new EmployeeServiceImpl();
+    private final BranchService branchService = new BranchServiceImpl();
+    private final EmployeeService employeeService = new EmployeeServiceImpl();
     private final ObservableList<Employee> employeeTableData = FXCollections.observableArrayList();
     private final ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
 
@@ -89,7 +89,7 @@ public class FXMLEmployeeManagerController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-            onLoad();
+        onLoad();
     }
 
     public void returnMain(ActionEvent event) {
@@ -122,6 +122,7 @@ public class FXMLEmployeeManagerController implements Initializable {
 
         TableColumn<Employee, ?> branchColumn = new TableColumn<>("Chi nhánh");
         branchColumn.setCellValueFactory(new PropertyValueFactory<>("branchId"));
+
         tableEmployee.getColumns().addAll(nameColumn, numberColumn, dateColumn, joinColumn, usernameColumn, roleColumn, branchColumn);
 
         TableColumn<Employee, Void> actionColumn = new TableColumn<>("Hành động");
@@ -131,7 +132,7 @@ public class FXMLEmployeeManagerController implements Initializable {
 
     }
 
-    public void onLoad(){
+    public void onLoad() {
         loadColumns();
         //Load role
         comboboxRole.getItems().addAll(Employee.EmployeeRole.Employee, Employee.EmployeeRole.Manager);
@@ -139,23 +140,20 @@ public class FXMLEmployeeManagerController implements Initializable {
         try {
             //Load branches
             List<Branch> branches = branchService.getAllBranches();
-            for (Branch branch : branches) {
-                branchTableData.add(new Branch(branch.getId(), branch.getBranchName(), branch.getAddress()));
-            }
+            branchTableData.addAll(branches);
             //Load employee
             List<Employee> employees = employeeService.getAllEmployees();
-            for (Employee employee : employees) {
-                employeeTableData.add(employee);
-            }
+            employeeTableData.addAll(employees);
+
             comboBoxBranch.setItems(branchTableData);
             comboBoxBranch.setValue(branchTableData.get(0));
 
             tableEmployee.setItems(employeeTableData);
-        } catch (SQLException ex){
+        } catch (SQLException ex) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
         }
     }
-    
+
     public void resetField() {
         comboBoxBranch.setValue(branchTableData.get(0));
         textFieldName.setText("");
@@ -179,6 +177,10 @@ public class FXMLEmployeeManagerController implements Initializable {
         textFieldNumber.setText(employee.getNumber());
         textFieldUsername.setText(employee.getUsername());
         textFieldUsername.setEditable(false);
+        textFieldPassword.setText(employee.getPassword());
+        textFieldConfirm.setText(employee.getPassword());
+        textFieldPassword.setDisable(true);
+        textFieldConfirm.setDisable(true);
         datePickerBirthday.setValue(LocalDate.parse(employee.getBirthday().toString()));
         comboboxRole.setValue(employee.getEmployeeRole());
     }
@@ -207,42 +209,45 @@ public class FXMLEmployeeManagerController implements Initializable {
         String username = textFieldUsername.getText().trim();
         String password = textFieldPassword.getText().trim();
         String confirmPassword = textFieldConfirm.getText().trim();
-        Employee.EmployeeRole role = comboboxRole.getValue();
-        if ("".equals(confirmPassword) || "".equals(name) || branch == null || "".equals(number) || "".equals(username) || "".equals(password)) {
-            Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR).showAndWait();
-            resetPassword();
-        } else if (birthday == null) {
-            Utils.getBox("Lỗi", "Lỗi nhập liệu", "Vui lòng nhập đúng định dạng ngày tháng (MM/dd/yyyy)", Alert.AlertType.ERROR).showAndWait();
-            resetPassword();
-            datePickerBirthday.requestFocus();
-        } else if (username.contains(" ")) {
-            Utils.getBox("Lỗi", "Lỗi nhập liệu", "username không nên có khoảng trắng", Alert.AlertType.ERROR).showAndWait();
-            resetPassword();
-        } else if (!number.matches("[0-9]+")) {
-        Utils.getBox("Lỗi", "Lỗi nhập liệu", "Lỗi nhập SDT", Alert.AlertType.ERROR).showAndWait();
-            resetPassword();
-            textFieldNumber.requestFocus();
-        } else if (employeeTableData.
-                stream().anyMatch(e -> !e.getId().equals(id) && e.getUsername().equals(username))) {
-            Utils.getBox("Lỗi", "Thêm thất bại", "Tài khoản đã có người sử dụng", Alert.AlertType.ERROR).showAndWait();
-            resetPassword();
-        } else if (employeeTableData.stream().anyMatch(e
-                -> !e.getId().equals(id)
-                && (e.getEmployeeName().equalsIgnoreCase(name)
-                && e.getBirthday().equals(Date.valueOf(birthday))
-                && e.getNumber().equals(number))
-        )) {
-            Utils.getBox("Lỗi", "Thêm thất bại", "Đã có nhân viên này", Alert.AlertType.ERROR).showAndWait();
-            resetPassword();
-        } else if (!password.equals(confirmPassword)) {
-            Utils.getBox("Lỗi", "Nhập sai", "Mật khẩu không trùng", Alert.AlertType.ERROR).showAndWait();
-            resetPassword();
-        } else {
+        if (Utils.checkEmpty(branch)
+                && Utils.checkName(name)
+                && Utils.checkNumber(number)
+                && Utils.checkBirthday(birthday)
+                && Utils.checkEmpty(username)
+                && Utils.checkEmpty(password)
+                && Utils.checkEmpty(confirmPassword)) {
+
+            if (!username.matches("^[a-zA-Z0-9_]+$")) {
+                Utils.getBox("Lỗi", "Lỗi nhập liệu", "username nên chỉ bao gồm các ký tự a-z, A-Z, 0-9 và dấu gạch dưới", Alert.AlertType.ERROR).showAndWait();
+                resetPassword();
+                return false;
+            } else if (employeeTableData.
+                    stream().anyMatch(e -> !e.getId().equals(id) && e.getUsername().equals(username))) {
+                Utils.getBox("Lỗi", "Thêm thất bại", "Tài khoản đã có người sử dụng", Alert.AlertType.ERROR).showAndWait();
+                resetPassword();
+                return false;
+            } else if (employeeTableData.stream().anyMatch(e
+                    -> !e.getId().equals(id)
+                    && (e.getEmployeeName().equalsIgnoreCase(name)
+                    && e.getBirthday().equals(Date.valueOf(birthday))
+                    && e.getNumber().equals(number))
+            )) {
+                Utils.getBox("Lỗi", "Thêm thất bại", "Đã có nhân viên này", Alert.AlertType.ERROR).showAndWait();
+                resetPassword();
+            } else if (!password.equals(confirmPassword)) {
+                Utils.getBox("Lỗi", "Nhập sai", "Mật khẩu không trùng", Alert.AlertType.ERROR).showAndWait();
+                resetPassword();
+                return false;
+            } else if (!password.matches("^(?=.*[a-z])(?=.*\\d)[a-z\\d]{8,}$")) {
+                Utils.getBox("Lỗi", "Nhập sai", "Mật khẩu có độ dài tối thiểu là 8 ký tự, chứa ít nhất một chữ cái viết thường và một số", Alert.AlertType.ERROR).showAndWait();
+                resetPassword();
+                return false;
+            }
             return true;
+
         }
         return false;
     }
-
     public void addEmployee(ActionEvent event) {
         Employee employee = new Employee();
         if (checkValid("")) {
@@ -317,6 +322,8 @@ public class FXMLEmployeeManagerController implements Initializable {
                             tableEmployee.refresh();
                             Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
                             afterCommitOrCancel();
+                            textFieldPassword.setDisable(false);
+                            textFieldConfirm.setDisable(false);
                         } catch (SQLException ex) {
                             Utils.getBox("Sửa thất bại", "Không sửa được", "Có lỗi với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
                             textFieldName.requestFocus();

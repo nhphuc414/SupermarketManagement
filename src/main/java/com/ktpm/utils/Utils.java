@@ -8,6 +8,7 @@ import com.ktpm.pojo.Product;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
@@ -19,7 +20,7 @@ import javafx.scene.control.ButtonType;
  * @author ad
  */
 public class Utils {
-
+    public static DecimalFormat df = new DecimalFormat("#.###");
     public static String normalizeName(String inputName) {
         String[] nameParts = inputName.split(" ");
         StringBuilder normalizedBuilder = new StringBuilder();

@@ -4,6 +4,7 @@
  */
 package com.ktpm.app;
 
+import com.ktpm.pojo.BranchProduct;
 import com.ktpm.pojo.Customer;
 import com.ktpm.pojo.Discount;
 import com.ktpm.pojo.OrderDetail;
@@ -21,13 +22,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
-import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -91,6 +92,9 @@ public class FXMLEmployeeMenuController implements Initializable {
     @FXML
     private Label labelTotalBirthday;
 
+    private final ProductService productService = new ProductServiceImpl();
+    private final BranchProductService branchProductService = new BranchProductServiceImpl();
+    private final CustomerService customerService = new CustomerServiceImpl();
     private final ObservableList<Product> productTableData = FXCollections.observableArrayList();
     private final ObservableList<OrderDetail> orderDetailTableData = FXCollections.observableArrayList();
     private final TableColumn<OrderDetail, String> priceFinalColumn = new TableColumn<>("Giá cuối cùng");
@@ -128,7 +132,6 @@ public class FXMLEmployeeMenuController implements Initializable {
             int productId = cellData.getValue().getProductId();
             String productName = "";
             try {
-                ProductService productService = new ProductServiceImpl();
                 productName = productService.getProductById(productId).toString();
             } catch (SQLException ex) {
                 Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -140,8 +143,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             int productId = cellData.getValue().getProductId();
             String price = "";
             try {
-                ProductService productService = new ProductServiceImpl();
-                price = String.valueOf(productService.getProductById(productId).getPrice());
+                price = Utils.df.format(productService.getProductById(productId).getPrice());
             } catch (SQLException ex) {
                 Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
             }
@@ -151,8 +153,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             int productId = cellData.getValue().getProductId();
             String price = "";
             try {
-                ProductService productService = new ProductServiceImpl();
-                price = String.valueOf(productService.getProductById(productId).getPrice());
+                price = Utils.df.format(productService.getProductById(productId).getPrice());
             } catch (SQLException ex) {
                 Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
             }
@@ -174,29 +175,25 @@ public class FXMLEmployeeMenuController implements Initializable {
 
     public void loadProducts() {
         try {
-            ProductService productService = new ProductServiceImpl();
-            BranchProductService branchProductService = new BranchProductServiceImpl();
             List<Product> products = productService.getAllProducts();
+            double quantityInStock;
             for (Product product : products) {
-                if (branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), product.getId()).getQuantity() != 0) {
+                BranchProduct stock = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), product.getId());
+                quantityInStock = stock == null ? 0 : stock.getQuantity();
+                if (quantityInStock > 0) {
                     productTableData.add(product);
                 }
             }
             comboBoxProduct.setItems(productTableData);
-            comboBoxProduct.setValue(productTableData.get(0));
-            if (productTableData.get(0) == null) {
-                textFieldQuantity.setText("");
-            } else {
-                textFieldQuantity.setText(productTableData.get(0).getProductType() == Product.ProductType.Quantity ? "1" : "0");
-            }
         } catch (SQLException ex) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
         }
     }
 
     public void onLoad() {
-        loadColumns();
+
         loadProducts();
+        loadColumns();
     }
 
     public void onChoose() {
@@ -206,15 +203,12 @@ public class FXMLEmployeeMenuController implements Initializable {
         } else {
             textFieldQuantity.setText(product.getProductType() == Product.ProductType.Quantity ? "1" : "0");
         }
+        textFieldQuantity.requestFocus();
     }
 
     public void resetField() {
-        comboBoxProduct.setValue(productTableData.get(0));
-        if (productTableData.get(0) == null) {
-            textFieldQuantity.setText("");
-        } else {
-            textFieldQuantity.setText(productTableData.get(0).getProductType() == Product.ProductType.Quantity ? "1" : "0");
-        }
+        comboBoxProduct.setValue(null);
+        textFieldQuantity.requestFocus();
     }
 
     public void resetAll() {
@@ -226,6 +220,7 @@ public class FXMLEmployeeMenuController implements Initializable {
         labelTotalBirthday.setText("");
         orderDetailTableData.removeAll(orderDetailTableData);
         pricePay = 0;
+        textFieldQuantity.requestFocus();
     }
 
     public void loadOnField(OrderDetail orderDetail) {
@@ -236,6 +231,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             }
         }
         textFieldQuantity.setText(String.valueOf(orderDetail.getQuantity()));
+        textFieldQuantity.requestFocus();
     }
 
     public void getOrderDetailInField(OrderDetail orderDetail) {
@@ -243,57 +239,43 @@ public class FXMLEmployeeMenuController implements Initializable {
         orderDetail.setQuantity(Double.parseDouble(textFieldQuantity.getText().trim()));
     }
 
-    public String getDiscountValue(int productId, double price) {
+    public Double getDiscountValue(int productId, double price) {
         DiscountService discountService = new DiscountServiceImpl();
         try {
             List<Discount> discounts = discountService.getDiscountsByProductId(productId);
             for (Discount discount : discounts) {
                 if (discount.getStartDate().before(Date.valueOf(LocalDate.now())) && discount.getEndDate().after(Date.valueOf(LocalDate.now()))) {
-                    return String.valueOf(price - price * discount.getDiscountPercent() / 100);
+                    return price - price * discount.getDiscountPercent() / 100;
                 }
             }
         } catch (SQLException ex) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
         }
-        return String.valueOf(price);
+        return price;
     }
 
     public boolean checkValid() {
         Product product = comboBoxProduct.getValue();
-        if (product == null) {
-            Utils.getBox("Lỗi", "", "Chưa chọn sản phẩm", Alert.AlertType.ERROR).showAndWait();
-            return false;
-        } else {
-            if (product.getProductType() == Product.ProductType.Quantity && !textFieldQuantity.getText().matches("\\d*")) {
-                    Utils.getBox("Lỗi", "", "Vui lòng nhập đúng số lượng", Alert.AlertType.ERROR).showAndWait();
-                    return false;
-            } else try
-                {
-                    double quantity = Double.parseDouble(textFieldQuantity.getText());
-                    BranchProductService branchProductService = new BranchProductServiceImpl();
-                    Double quantityInStock;
-                    quantityInStock = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), product.getId()).getQuantity();
-                    if ((product.getProductType() == Product.ProductType.Quantity && quantity<1 && quantity> quantityInStock) 
-                     || (product.getProductType() == Product.ProductType.Weight && quantity<=0 && quantity> quantityInStock)){
-                        Utils.getBox("Lỗi", "", "Số lượng không chính xác", Alert.AlertType.ERROR).showAndWait();
-                        return false;
-                    }
-                } catch (NumberFormatException e) {
-                Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đúng số lượng", Alert.AlertType.ERROR).showAndWait();
-                return false;
-                } catch (SQLException ex) {
-                    Utils.getBox("Thất bại", "Có lỗi", "Lỗi kết nối với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
+        if (Utils.checkProductQuantity(product, textFieldQuantity.getText())) {
+            double quantity = Double.parseDouble(textFieldQuantity.getText());
+            try {
+                Double quantityInStock;
+                quantityInStock = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), product.getId()).getQuantity();
+                if (quantity > quantityInStock) {
+                    Utils.getBox("Lỗi", "", "Số lượng lớn hơn trong kho", Alert.AlertType.ERROR).showAndWait();
                     return false;
                 }
+            } catch (SQLException ex) {
+                Utils.getBox("Lỗi", "", "Lỗi kết nối đến Database", Alert.AlertType.ERROR).showAndWait();
+                return false;
             }
-        
+            return true;
+        }
         return false;
     }
 
     public void checkCustomer() {
         String number = textFieldNumber.getText();
-        CustomerService customerService = new CustomerServiceImpl();
-
         try {
             Customer findcustomer = customerService.getCustomerByNumber(number);
             if (findcustomer == null) {
@@ -303,8 +285,7 @@ public class FXMLEmployeeMenuController implements Initializable {
                     int productId = cellData.getValue().getProductId();
                     String price = "";
                     try {
-                        ProductService productService = new ProductServiceImpl();
-                        price = String.valueOf(productService.getProductById(productId).getPrice());
+                        price = Utils.df.format(productService.getProductById(productId).getPrice());
                     } catch (SQLException ex) {
                         Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
                     }
@@ -318,8 +299,7 @@ public class FXMLEmployeeMenuController implements Initializable {
                     int productId = cellData.getValue().getProductId();
                     String price = "";
                     try {
-                        ProductService productService = new ProductServiceImpl();
-                        price = getDiscountValue(productId, productService.getProductById(productId).getPrice());
+                        price = Utils.df.format(getDiscountValue(productId, productService.getProductById(productId).getPrice()));
                     } catch (SQLException ex) {
                         Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
                     }
@@ -329,33 +309,32 @@ public class FXMLEmployeeMenuController implements Initializable {
                 tableOrderDetail.refresh();
             }
         } catch (SQLException ex) {
-            Logger.getLogger(FXMLEmployeeMenuController.class.getName()).log(Level.SEVERE, null, ex);
+            Utils.getBox("Thất bại", "Có lỗi", "Kết nối cơ sở dữ liệu thất bại", Alert.AlertType.ERROR).showAndWait();
         }
     }
 
     public void countTotal() {
-
         double sum = 0;
         for (var item : tableOrderDetail.getItems()) {
             sum += item.getQuantity() * Double.parseDouble(priceFinalColumn.getCellData(item));
         }
-        DecimalFormat df = new DecimalFormat("#.##");
         if (customer != null && customer.getBirthday().toLocalDate().getMonth() == LocalDate.now().getMonth()
                 && customer.getBirthday().toLocalDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()
                 && sum >= 1000000) {
-            labelTotal.setText(df.format(sum) + "     --->");
+            labelTotal.setText(Utils.df.format(sum) + "     --->");
             sum = sum - sum * 0.1;
             pricePay = sum;
-            labelTotalBirthday.setText(df.format(sum) + "(-10%)");
+            labelTotalBirthday.setText(Utils.df.format(sum) + "(-10%)");
         } else {
             pricePay = sum;
-            labelTotal.setText(df.format(sum));
+            labelTotal.setText(Utils.df.format(sum));
             labelTotalBirthday.setText("");
         }
     }
 
     public void addCustomer() {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("FXMLCustomer.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class
+                .getResource("FXMLCustomer.fxml"));
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle("Thêm khách hàng");
@@ -388,6 +367,20 @@ public class FXMLEmployeeMenuController implements Initializable {
             boolean inTable = false;
             for (OrderDetail orderDetailInTable : orderDetailTableData) {
                 if (orderDetailInTable.getProductId() == orderDetail.getProductId()) {
+                    double totalQuantity = orderDetailInTable.getQuantity() + orderDetail.getQuantity();
+                    double quantityInStock;
+                    try {
+                        quantityInStock = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), orderDetailInTable.getProductId()).getQuantity();
+                    } catch (SQLException ex) {
+                        Utils.getBox("Lỗi", "", "Lỗi kết nối đến Database", Alert.AlertType.ERROR).showAndWait();
+                        inTable = true;
+                        break;
+                    }
+                    if (totalQuantity > quantityInStock) {
+                        Utils.getBox("Lỗi", "", "Số lượng lớn hơn trong kho", Alert.AlertType.ERROR).showAndWait();
+                        inTable = true;
+                        break;
+                    }
                     orderDetailInTable.setQuantity(orderDetailInTable.getQuantity() + orderDetail.getQuantity());
                     inTable = true;
                     countTotal();
@@ -439,6 +432,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             }
         } else {
             Utils.getBox("Thất bại", "", "Không có đơn hàng", Alert.AlertType.ERROR).showAndWait();
+
         }
     }
 

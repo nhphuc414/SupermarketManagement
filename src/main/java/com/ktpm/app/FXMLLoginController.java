@@ -53,7 +53,7 @@ public class FXMLLoginController implements Initializable {
         } catch (SQLException e) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", e.getMessage(), Alert.AlertType.ERROR).showAndWait();
         } catch (IOException e) {
-            Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
+            Utils.getBox("Thất bại", e.getLocalizedMessage(), e.getMessage(), Alert.AlertType.ERROR).showAndWait();
         }
     }
     /**

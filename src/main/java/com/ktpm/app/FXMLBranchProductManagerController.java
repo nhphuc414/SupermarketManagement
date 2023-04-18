@@ -59,7 +59,9 @@ public class FXMLBranchProductManagerController implements Initializable {
 
     @FXML
     private TextField textFieldQuantity;
-    
+    private final ProductService productService = new ProductServiceImpl();
+    private final BranchService branchService = new BranchServiceImpl();
+    private final BranchProductService branchProductService = new BranchProductServiceImpl();
     private final ObservableList<Product> productTableData = FXCollections.observableArrayList();
     private final ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
     private final ObservableList<BranchProduct> branchProductTableData = FXCollections.observableArrayList();
@@ -74,6 +76,7 @@ public class FXMLBranchProductManagerController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         onLoad();
     }
+
     public void returnMain(ActionEvent event) {
         try {
             App.setRoot("FXMLAdminMenu", " Manager");
@@ -86,15 +89,15 @@ public class FXMLBranchProductManagerController implements Initializable {
         TableColumn<BranchProduct, ?> branchProductIdColumn = new TableColumn<>("Stock ID");
         branchProductIdColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
 
-        TableColumn<BranchProduct, ?> quantityColumn = new TableColumn<>("Số lượng");
-        quantityColumn.setCellValueFactory(new PropertyValueFactory<>("quantity"));
-
+        TableColumn<BranchProduct, String> quantityColumn = new TableColumn<>("Số lượng");
+        quantityColumn.setCellValueFactory(cellData -> {
+            return new SimpleStringProperty(Utils.df.format(cellData.getValue().getQuantity()));
+        });
         TableColumn<BranchProduct, String> productNameColumn = new TableColumn<>("Sản phẩm");
         productNameColumn.setCellValueFactory(cellData -> {
             int productId = cellData.getValue().getProductId();
             String productName = "";
             try {
-                ProductService productService = new ProductServiceImpl();
                 productName = productService.getProductById(productId).toString();
             } catch (SQLException ex) {
                 Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -107,7 +110,6 @@ public class FXMLBranchProductManagerController implements Initializable {
             String branchId = cellData.getValue().getBranchId();
             String branchName = "";
             try {
-                BranchService branchService = new BranchServiceImpl();
                 branchName = branchService.getBranchById(branchId).getBranchName();
             } catch (SQLException ex) {
                 Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -115,7 +117,6 @@ public class FXMLBranchProductManagerController implements Initializable {
             return new SimpleStringProperty(branchName);
         });
         tableBranchProduct.getColumns().addAll(branchProductIdColumn, branchNameColumn, productNameColumn, quantityColumn);
-
         TableColumn<BranchProduct, Void> actionColumn = new TableColumn<>("Hành động");
         actionColumn.setCellFactory(param -> new ButtonCell());
         actionColumn.setPrefWidth(300);
@@ -126,18 +127,19 @@ public class FXMLBranchProductManagerController implements Initializable {
         loadColumns();
         try {
             //Load branches
-            BranchService branchService = new BranchServiceImpl();
             List<Branch> branches = branchService.getAllBranches();
-            branchTableData.addAll(branches);
+            for (Branch branch : branches) {
+                branchTableData.add(branch);
+            }
             //Load product
-            ProductService productService = new ProductServiceImpl();
             List<Product> products = productService.getAllProducts();
-            productTableData.addAll(products);
+            for (Product product : products) {
+                productTableData.add(product);
+            }
             comboBoxBranch.setItems(branchTableData);
             comboBoxBranch.setValue(branchTableData.get(0));
             comboBoxProduct.setItems(productTableData);
             comboBoxProduct.setValue(productTableData.get(0));
-            BranchProductService branchProductService = new BranchProductServiceImpl();
             List<BranchProduct> branchProducts = branchProductService.getAllBranchProducts();
             branchProductTableData.addAll(branchProducts);
             tableBranchProduct.setItems(branchProductTableData);
@@ -168,7 +170,7 @@ public class FXMLBranchProductManagerController implements Initializable {
         }
         comboBoxBranch.setDisable(true);
         comboBoxProduct.setDisable(true);
-        textFieldQuantity.setText(String.valueOf(branchProduct.getQuantity()));
+        textFieldQuantity.setText(Utils.df.format(branchProduct.getQuantity()));
         textFieldQuantity.requestFocus();
     }
 
@@ -182,33 +184,40 @@ public class FXMLBranchProductManagerController implements Initializable {
         Branch branch = comboBoxBranch.getValue();
         Product product = comboBoxProduct.getValue();
         String quantity = textFieldQuantity.getText();
-        if (Utils.checkEmpty(branch) && Utils.checkProductQuantity(product, quantity)){
-            if (branchProductTableData.stream().anyMatch(bp ->
-            !bp.getId().equals(id) && bp.getBranchId().equals(branch.getId()) && bp.getProductId()==product.getId())){
-                Utils.getBox("Lỗi", "Thêm thất bại", "Kho đã có sản phẩm này", Alert.AlertType.ERROR).showAndWait();  
-                return false;
-            }
-            return true;
-        }
-        return false;
+        return Utils.checkEmpty(branch) && Utils.checkProductQuantity(product, quantity);
     }
 
-    public void addBranchProduct(ActionEvent event) {
-        BranchProduct branchProduct = new BranchProduct();
+    public void addBranchProduct() {
         if (checkValid("")) {
+            BranchProduct branchProduct = new BranchProduct();
             getBranchProductInField(branchProduct);
             try {
-                BranchProductService branchProductService = new BranchProductServiceImpl();
-                branchProductService.addBranchProduct(branchProduct);
-                branchProductTableData.add(branchProduct);
-                Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
-                resetField();
+                BranchProduct existBranchProduct=null;
+                for(BranchProduct bp:branchProductTableData){
+                    if (bp.getBranchId().equals(branchProduct.getBranchId())&&bp.getProductId()==branchProduct.getProductId()){
+                       existBranchProduct=bp;
+                       break;
+                    }
+                }
+                if (existBranchProduct != null) {
+                    existBranchProduct.setQuantity(branchProduct.getQuantity() + existBranchProduct.getQuantity());
+                    branchProductService.updateBranchProduct(existBranchProduct);
+                    tableBranchProduct.refresh();
+                    Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
+                    resetField();
+                } else {
+                    branchProductService.addBranchProduct(branchProduct);
+                    branchProductTableData.add(branchProduct);
+                    Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
+                    resetField();
+                }
+
             } catch (SQLException ex) {
                 Utils.getBox("Thất bại", "Có lỗi", "Thêm thất bại", Alert.AlertType.ERROR).showAndWait();
             }
         }
     }
-    
+
     private class ButtonCell extends TableCell<BranchProduct, Void> {
 
         private final Button editButton = new Button("Sửa");
@@ -255,17 +264,16 @@ public class FXMLBranchProductManagerController implements Initializable {
                     afterCommitOrCancel();
                 });
                 editButton.setOnAction(commitEvent -> {
-                    
                     if (checkValid(branchProduct.getId())) {
                         getBranchProductInField(branchProduct);
                         try {
-                            BranchProductService branchProductService = new BranchProductServiceImpl();
                             branchProductService.updateBranchProduct(branchProduct);
                             tableBranchProduct.refresh();
-                            Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
-                            afterCommitOrCancel();
                             comboBoxBranch.setDisable(false);
                             comboBoxProduct.setDisable(false);
+                            Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
+                            afterCommitOrCancel();
+                            
                         } catch (SQLException ex) {
                             Utils.getBox("Sửa thất bại", "Không sửa được", "Có lỗi với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
 
@@ -275,11 +283,10 @@ public class FXMLBranchProductManagerController implements Initializable {
             });
             deleteButton.setOnAction(event -> {
                 BranchProduct branchProduct = getTableView().getItems().get(getIndex());
-                Alert alert = Utils.getBox("Xác nhận xóa", "Bạn có chắc chắn muốn xóa?","Stock sẽ bị xóa vĩnh viễn.", Alert.AlertType.CONFIRMATION);
+                Alert alert = Utils.getBox("Xác nhận xóa", "Bạn có chắc chắn muốn xóa?", "Stock sẽ bị xóa vĩnh viễn.", Alert.AlertType.CONFIRMATION);
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     try {
-                        BranchProductService branchProductService = new BranchProductServiceImpl();
                         branchProductService.deleteBranchProduct(branchProduct.getId());
                         branchProductTableData.remove(branchProduct);
                         Utils.getBox("Thành công", "", "Xóa thành công", Alert.AlertType.INFORMATION).showAndWait();

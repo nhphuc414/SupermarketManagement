@@ -37,7 +37,8 @@ public class FXMLCustomerController implements Initializable {
 
     @FXML
     private TextField textFieldNumber;
-
+    
+    private final CustomerService customerService = new CustomerServiceImpl();
     /**
      * Initializes the controller class.
      *
@@ -66,7 +67,6 @@ public class FXMLCustomerController implements Initializable {
         String number = textFieldNumber.getText().trim();
         LocalDate birthday = datePickerBirthday.getValue();
         if (Utils.checkName(name) && Utils.checkNumber(number) && Utils.checkBirthday(birthday)) {
-            CustomerService customerService = new CustomerServiceImpl();
             Customer existCustomer;
             try {
                 existCustomer = customerService.getCustomerByNumber(number);
@@ -88,7 +88,6 @@ public class FXMLCustomerController implements Initializable {
         if (checkValid()) {
             getCustomerInField(customer);
             try {
-                CustomerService customerService = new CustomerServiceImpl();
                 customerService.addCustomer(customer);
                 Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
                 resetField();

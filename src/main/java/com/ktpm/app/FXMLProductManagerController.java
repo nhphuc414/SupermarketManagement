@@ -6,7 +6,9 @@ package com.ktpm.app;
 
 import com.ktpm.pojo.Product;
 import com.ktpm.pojo.Product.ProductType;
+import com.ktpm.services.BranchProductService;
 import com.ktpm.services.ProductService;
+import com.ktpm.services.impl.BranchProductServiceImpl;
 import com.ktpm.services.impl.ProductServiceImpl;
 import com.ktpm.utils.Utils;
 import java.io.IOException;
@@ -15,6 +17,9 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -56,7 +61,7 @@ public class FXMLProductManagerController implements Initializable {
 
     @FXML
     private TextField textFieldPrice;
-
+    private final BranchProductService branchProductService = new BranchProductServiceImpl();
     private final ProductService productService = new ProductServiceImpl();
     private final ObservableList<Product> productTableData = FXCollections.observableArrayList();
 
@@ -90,8 +95,10 @@ public class FXMLProductManagerController implements Initializable {
         TableColumn<Product, ?> originColumn = new TableColumn<>("Xuất xứ");
         originColumn.setCellValueFactory(new PropertyValueFactory<>("origin"));
 
-        TableColumn<Product, ?> priceColumn = new TableColumn<>("Giá");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
+        TableColumn<Product, String> priceColumn = new TableColumn<>("Giá");
+        priceColumn.setCellValueFactory(cellData -> {
+            return new SimpleStringProperty(Utils.df.format(cellData.getValue().getPrice()));
+        });
 
         TableColumn<Product, ?> typeColumn = new TableColumn<>("Kiểu định lượng");
         typeColumn.setCellValueFactory(new PropertyValueFactory<>("productType"));
@@ -111,9 +118,7 @@ public class FXMLProductManagerController implements Initializable {
         comboBoxType.setValue(ProductType.Quantity);
         try {
             List<Product> products = productService.getAllProducts();
-            for (Product product : products) {
-                productTableData.add(new Product(product.getId(), product.getProductName(), product.getPrice(), product.getOrigin(), product.getProductType()));
-            }
+            productTableData.addAll(products);
             tableProduct.setItems(productTableData);
         } catch (SQLException ex) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -143,33 +148,65 @@ public class FXMLProductManagerController implements Initializable {
         product.setProductType(comboBoxType.getValue());
     }
 
-    public boolean checkValid(int id) {
+    public boolean checkValid() {
         String name = textFieldName.getText().trim();
         String origin = textFieldOrigin.getText().trim();
         String price = textFieldPrice.getText().trim();
-        ProductType type = comboBoxType.getValue();
-        if ("".equals(name) || "".equals(origin) || "".equals(price)) {
-            Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR).showAndWait();
-            textFieldName.requestFocus();
-        } else if (productTableData.
-                stream().anyMatch(p -> !(p.getId() == id) && (p.getProductName().equals(name) && p.getOrigin().equals(origin)))) {
-            Utils.getBox("Lỗi", "Trùng sản phẩm", "Đã có sản phẩm này", Alert.AlertType.INFORMATION).showAndWait();
-            textFieldName.requestFocus();
-        } else {
+        if (Utils.checkTextField(name, "Tên sản phẩm", 30, 0)
+                && Utils.checkTextField(origin, "Xuất xứ", 30, 0)
+                && Utils.checkEmpty(price)) {
+            try {
+                Double priceProduct = Double.valueOf(price);
+                if (priceProduct <= 0) {
+                    Utils.getBox("Lỗi", "", "Vui lòng nhập số lượng chính xác", Alert.AlertType.ERROR).showAndWait();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                Utils.getBox("Lỗi", "Sai số lượng", "Vui lòng nhập đúng số lượng", Alert.AlertType.ERROR).showAndWait();
+                return false;
+            }
             return true;
         }
         return false;
     }
 
+    public Product checkexistProduct(Product product) {
+        for (Product p : productTableData) {
+            if (!(p.getId() == product.getId()) && p.getOrigin().equals(product.getOrigin()) && p.getProductType().equals(product.getProductType()) && p.getProductName().equals(product.getProductName())) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    public boolean checkStock(Product product) {
+        try {
+            return !branchProductService.getBranchProductsByProductId(product.getId()).isEmpty();
+        } catch (SQLException ex) {
+            Utils.getBox("Thất bại", "Có lỗi", "Không thể kết nối đến cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
+        }
+        return true;
+    }
+
     public void addProduct(ActionEvent event) {
         Product product = new Product();
-        if (checkValid(0)) {
+        if (checkValid()) {
             getProductInField(product);
             try {
-                product.setId(productService.addProduct(product));
-                productTableData.add(product);
-                Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
-                resetField();
+                product.setId(-1);
+                Product existProduct = checkexistProduct(product);
+                if (existProduct != null) {
+                    existProduct.setPrice(product.getPrice());
+                    productService.updateProduct(existProduct);
+                    tableProduct.refresh();
+                    Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
+                    resetField();
+                } else {
+                    product.setId(productService.addProduct(product));
+                    productTableData.add(product);
+                    Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
+                    resetField();
+                }
             } catch (SQLException ex) {
                 Utils.getBox("Thất bại", "Có lỗi", "Thêm thất bại", Alert.AlertType.ERROR).showAndWait();
                 textFieldName.requestFocus();
@@ -224,16 +261,25 @@ public class FXMLProductManagerController implements Initializable {
                     afterCommitOrCancel();
                 });
                 editButton.setOnAction(commitEvent -> {
-                    if (checkValid(product.getId())) {
+                    if (checkValid()) {
                         getProductInField(product);
-                        try {
-                            productService.updateProduct(product);
-                            tableProduct.refresh();
-                            Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
-                            afterCommitOrCancel();
-                        } catch (SQLException ex) {
-                            Utils.getBox("Cập nhật thất bại", "Không thể cập nhật", "Có lỗi với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
+                        if (checkexistProduct(product) != null) {
+                            Utils.getBox("Cập nhật thất bại", "Không thể cập nhật", "Đã tồn tại sản phẩm", Alert.AlertType.ERROR).showAndWait();
                             textFieldName.requestFocus();
+
+                        } else if (checkStock(product)) {
+                            Utils.getBox("Cập nhật thất bại", "Không thể cập nhật", "Kho vẫn còn sản phẩm", Alert.AlertType.ERROR).showAndWait();
+                            textFieldName.requestFocus();
+                        } else {
+                            try {
+                                productService.updateProduct(product);
+                                tableProduct.refresh();
+                                Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
+                                afterCommitOrCancel();
+                            } catch (SQLException ex) {
+                                Utils.getBox("Cập nhật thất bại", "Không thể cập nhật", "Lỗi không cập nhật được", Alert.AlertType.ERROR).showAndWait();
+                                textFieldName.requestFocus();
+                            }
                         }
                     }
                 });
@@ -247,8 +293,9 @@ public class FXMLProductManagerController implements Initializable {
                         productService.deleteProduct(product.getId());
                         productTableData.remove(product);
                         Utils.getBox("Thành công", "", "Xóa thành công", Alert.AlertType.INFORMATION).showAndWait();
+                        resetField();
                     } catch (SQLException ex) {
-                        Utils.getBox("Xóa thất bại", "", "Lỗi không thể xóa được", Alert.AlertType.ERROR).showAndWait();
+                        Utils.getBox("Xóa thất bại", "", "Kho vẫn còn sản phẩm", Alert.AlertType.ERROR).showAndWait();
                     }
                 }
             });
@@ -256,6 +303,7 @@ public class FXMLProductManagerController implements Initializable {
         }
 
         @Override
+
         protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {

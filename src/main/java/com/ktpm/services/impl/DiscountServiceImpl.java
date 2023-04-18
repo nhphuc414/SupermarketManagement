@@ -30,11 +30,12 @@ public class DiscountServiceImpl implements DiscountService {
             pstmt.setDate(2, discount.getEndDate());
             pstmt.setDouble(3, discount.getDiscountPercent());
             pstmt.setInt(4, discount.getProductId());
+            pstmt.executeUpdate();
             ResultSet rs = pstmt.getGeneratedKeys();
             if (rs.next()) {
                 return rs.getInt(1);
             }
-            pstmt.executeUpdate();
+            
         }
         return 0;
     }
