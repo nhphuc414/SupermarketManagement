@@ -111,9 +111,7 @@ public class FXMLDiscountManagerController implements Initializable {
 
         TableColumn<Discount, ?> percentColumn = new TableColumn<>("Giảm(%)");
         percentColumn.setCellValueFactory(new PropertyValueFactory<>("discountPercent"));
-
         tableDiscount.getColumns().addAll(idColumn,productNameColumn, startColumn, endColumn, percentColumn);
-
         TableColumn<Discount, Void> actionColumn = new TableColumn<>("Hành động");
         actionColumn.setCellFactory(param -> new ButtonCell());
         actionColumn.setPrefWidth(300);
@@ -170,7 +168,6 @@ public class FXMLDiscountManagerController implements Initializable {
         String percent = textFieldPercent.getText();
         if (product == null || "".equals(percent)) {
             Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR).showAndWait();
-
         } else if (startDate == null || endDate == null) {
             Utils.getBox("Lỗi", "Lỗi nhập liệu", "Vui lòng nhập đúng định dạng ngày tháng (MM/dd/yyyy)", Alert.AlertType.ERROR).showAndWait();
         } else if (discountTableData.stream().anyMatch(d -> !(id == d.getId()) && product.getId() == d.getProductId() && d.getStartDate().equals(Date.valueOf(startDate)) && d.getEndDate().equals(Date.valueOf(endDate)))) {
@@ -262,6 +259,7 @@ public class FXMLDiscountManagerController implements Initializable {
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
                     try { 
+                        
                         discountService.deleteDiscount(discount.getId());
                         discountTableData.remove(discount);
                         Utils.getBox("Thành công", "", "Xóa thành công", Alert.AlertType.INFORMATION).showAndWait();

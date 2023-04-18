@@ -219,7 +219,7 @@ public class FXMLEmployeeManagerController implements Initializable {
             Utils.getBox("Lỗi", "Lỗi nhập liệu", "username không nên có khoảng trắng", Alert.AlertType.ERROR).showAndWait();
             resetPassword();
         } else if (!number.matches("[0-9]+")) {
-            Utils.getBox("Lỗi", "Lỗi nhập liệu", "Lỗi nhập SDT", Alert.AlertType.ERROR).showAndWait();
+        Utils.getBox("Lỗi", "Lỗi nhập liệu", "Lỗi nhập SDT", Alert.AlertType.ERROR).showAndWait();
             resetPassword();
             textFieldNumber.requestFocus();
         } else if (employeeTableData.

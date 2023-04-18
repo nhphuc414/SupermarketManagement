@@ -113,6 +113,7 @@ public class Product {
     
     @Override
     public String toString() {
-        return id + " " + productName + " (" + origin + ")";
+        String quantity = this.getProductType()==ProductType.Quantity ?"Đơn vị":"Kg";
+        return id + " " + productName + " (" + origin + ")" + " (" + quantity + ")" ;
     }
 }
