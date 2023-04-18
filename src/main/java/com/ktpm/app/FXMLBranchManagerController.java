@@ -48,7 +48,7 @@ public class FXMLBranchManagerController implements Initializable {
     private TextField textFieldAddress;
 
     private final BranchService branchService = new BranchServiceImpl();
-    private final ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
+    private final  ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -85,9 +85,7 @@ public class FXMLBranchManagerController implements Initializable {
         loadColumns();
         try {
             List<Branch> branches = branchService.getAllBranches();
-            for (Branch branch : branches) {
-                branchTableData.add(new Branch(branch.getId(), branch.getBranchName(), branch.getAddress()));
-            }
+            branchTableData.addAll(branches);
             tableBranch.setItems(branchTableData);
         } catch (SQLException ex) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -114,16 +112,20 @@ public class FXMLBranchManagerController implements Initializable {
     public boolean checkValid(String id) {
         String name = textFieldName.getText().trim();
         String address = textFieldAddress.getText().trim();
-        if ("".equals(name) || "".equals(address)) {
-            Utils.getBox("Lỗi", "", "Không được để trống tên hoặc địa chỉ", AlertType.ERROR).showAndWait();
-            textFieldName.requestFocus();
-        } else if (branchTableData.stream().anyMatch(b -> !b.getId().equals(id) && (b.getBranchName().equalsIgnoreCase(name) || b.getAddress().equalsIgnoreCase(address)))) {
-            Utils.getBox("Lỗi", "", "Trùng tên địa chỉ hoặc chi nhánh", AlertType.ERROR).showAndWait();
-            textFieldName.requestFocus();
-        } else {
-            return true;
+        if (Utils.checkTextField(name, "Tên chi nhánh", 30, 0)
+            && Utils.checkTextField(address, "Tên chi nhánh", 50, 4)) {
+            if (branchTableData.stream().
+                    anyMatch(b -> !b.getId().equals(id)
+                    && (   b.getBranchName().equalsIgnoreCase(name) 
+                        || b.getAddress().equalsIgnoreCase(address)))) {
+                Utils.getBox("Lỗi", "", "Trùng tên địa chỉ hoặc chi nhánh", AlertType.ERROR).showAndWait();
+                textFieldName.requestFocus();
+                return false;
+            } else return true;
         }
+        textFieldName.requestFocus();
         return false;
+        
     }
 
     public void addBranch(ActionEvent event) {
@@ -185,7 +187,7 @@ public class FXMLBranchManagerController implements Initializable {
                 originalDeleteEvent = deleteButton.getOnAction();
                 Branch branch = getTableView().getItems().get(getIndex());
                 loadOnField(branch);
-
+                
                 deleteButton.setOnAction(cancelEvent -> {
                     afterCommitOrCancel();
                 });

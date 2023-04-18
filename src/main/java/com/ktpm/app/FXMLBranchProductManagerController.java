@@ -59,6 +59,7 @@ public class FXMLBranchProductManagerController implements Initializable {
 
     @FXML
     private TextField textFieldQuantity;
+    
     private final ObservableList<Product> productTableData = FXCollections.observableArrayList();
     private final ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
     private final ObservableList<BranchProduct> branchProductTableData = FXCollections.observableArrayList();
@@ -181,14 +182,13 @@ public class FXMLBranchProductManagerController implements Initializable {
         Branch branch = comboBoxBranch.getValue();
         Product product = comboBoxProduct.getValue();
         String quantity = textFieldQuantity.getText();
-        if (branch == null || product == null || "".equals(quantity)) {
-            Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng điền đủ thông tin", Alert.AlertType.ERROR).showAndWait();
-        } else {
+        if (Utils.checkEmpty(branch) && Utils.checkProductQuantity(product, quantity)){
             if (branchProductTableData.stream().anyMatch(bp ->
             !bp.getId().equals(id) && bp.getBranchId().equals(branch.getId()) && bp.getProductId()==product.getId())){
                 Utils.getBox("Lỗi", "Thêm thất bại", "Kho đã có sản phẩm này", Alert.AlertType.ERROR).showAndWait();  
+                return false;
             }
-            else return true;
+            return true;
         }
         return false;
     }

@@ -22,7 +22,7 @@ import javafx.scene.control.ButtonType;
 public class FXMLAdminMenuController implements Initializable {
 
     public void handleSignOut(ActionEvent event) {
-        Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
+        Alert alert = Utils.getBox("Xác nhận đăng xuất", null, "Bạn có chắc chắn rằng muốn đăng xuất?", Alert.AlertType.CONFIRMATION);
         Optional<ButtonType> result = alert.showAndWait();
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try {
@@ -34,7 +34,7 @@ public class FXMLAdminMenuController implements Initializable {
         }
     }
 
-    public void handleBranchManager(ActionEvent event) {
+    public void handleBranchManager() {
         try {
             App.setRoot("FXMLBranchManager", "Branch Manager");
         } catch (IOException io) {
@@ -42,7 +42,7 @@ public class FXMLAdminMenuController implements Initializable {
         }
     }
 
-    public void handleEmployeeManager(ActionEvent event) {
+    public void handleEmployeeManager() {
         try {
             App.setRoot("FXMLEmployeeManager", "Employee Manager");
         } catch (IOException io) {
@@ -50,7 +50,7 @@ public class FXMLAdminMenuController implements Initializable {
         }
     }
     
-    public void handleProductManager(ActionEvent event) {
+    public void handleProductManager() {
         try {
             App.setRoot("FXMLProductManager", "Product Manager");
         } catch (IOException io) {
@@ -58,16 +58,16 @@ public class FXMLAdminMenuController implements Initializable {
         }
     }
     
-    public void handleBranchProductManager(ActionEvent event) {
+    public void handleBranchProductManager() {
         try {
             App.setRoot("FXMLBranchProductManager", "Stock Manager");
         } catch (IOException io) {
             Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
         }
     }
-     public void handleDiscountManager(ActionEvent event) {
+     public void handleDiscountManager() {
         try {
-            App.setRoot("FXMLDiscountManager", "Stock Manager");
+            App.setRoot("FXMLDiscountManager", "Discount Manager");
         } catch (IOException io) {
             Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
         }

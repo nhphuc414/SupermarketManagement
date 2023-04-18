@@ -4,15 +4,15 @@
  */
 package com.ktpm.app;
 
-
 import com.ktpm.pojo.Customer;
 import com.ktpm.pojo.Discount;
 import com.ktpm.pojo.OrderDetail;
 import com.ktpm.pojo.Product;
-
+import com.ktpm.services.BranchProductService;
 import com.ktpm.services.CustomerService;
 import com.ktpm.services.DiscountService;
 import com.ktpm.services.ProductService;
+import com.ktpm.services.impl.BranchProductServiceImpl;
 import com.ktpm.services.impl.CustomerServiceImpl;
 import com.ktpm.services.impl.DiscountServiceImpl;
 import com.ktpm.services.impl.ProductServiceImpl;
@@ -97,6 +97,7 @@ public class FXMLEmployeeMenuController implements Initializable {
     public static boolean resetOrderDetail = false;
     private double pricePay = 0;
     Customer customer;
+
     /**
      * Initializes the controller class.
      *
@@ -174,8 +175,13 @@ public class FXMLEmployeeMenuController implements Initializable {
     public void loadProducts() {
         try {
             ProductService productService = new ProductServiceImpl();
+            BranchProductService branchProductService = new BranchProductServiceImpl();
             List<Product> products = productService.getAllProducts();
-            productTableData.addAll(products);
+            for (Product product : products) {
+                if (branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), product.getId()).getQuantity() != 0) {
+                    productTableData.add(product);
+                }
+            }
             comboBoxProduct.setItems(productTableData);
             comboBoxProduct.setValue(productTableData.get(0));
             if (productTableData.get(0) == null) {
@@ -253,7 +259,35 @@ public class FXMLEmployeeMenuController implements Initializable {
     }
 
     public boolean checkValid() {
-        return true;
+        Product product = comboBoxProduct.getValue();
+        if (product == null) {
+            Utils.getBox("Lỗi", "", "Chưa chọn sản phẩm", Alert.AlertType.ERROR).showAndWait();
+            return false;
+        } else {
+            if (product.getProductType() == Product.ProductType.Quantity && !textFieldQuantity.getText().matches("\\d*")) {
+                    Utils.getBox("Lỗi", "", "Vui lòng nhập đúng số lượng", Alert.AlertType.ERROR).showAndWait();
+                    return false;
+            } else try
+                {
+                    double quantity = Double.parseDouble(textFieldQuantity.getText());
+                    BranchProductService branchProductService = new BranchProductServiceImpl();
+                    Double quantityInStock;
+                    quantityInStock = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), product.getId()).getQuantity();
+                    if ((product.getProductType() == Product.ProductType.Quantity && quantity<1 && quantity> quantityInStock) 
+                     || (product.getProductType() == Product.ProductType.Weight && quantity<=0 && quantity> quantityInStock)){
+                        Utils.getBox("Lỗi", "", "Số lượng không chính xác", Alert.AlertType.ERROR).showAndWait();
+                        return false;
+                    }
+                } catch (NumberFormatException e) {
+                Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đúng số lượng", Alert.AlertType.ERROR).showAndWait();
+                return false;
+                } catch (SQLException ex) {
+                    Utils.getBox("Thất bại", "Có lỗi", "Lỗi kết nối với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
+                    return false;
+                }
+            }
+        
+        return false;
     }
 
     public void checkCustomer() {
@@ -372,12 +406,12 @@ public class FXMLEmployeeMenuController implements Initializable {
     public void payOrder() {
         if (!orderDetailTableData.isEmpty()) {
             FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("FXMLPay.fxml"));
-            FXMLPayController payController= new FXMLPayController();
+            FXMLPayController payController = new FXMLPayController();
             payController.setTotal(pricePay);
             payController.setOrderDetailTableData(orderDetailTableData);
-            payController.setCustomeId(customer==null?null:customer.getId());
+            payController.setCustomeId(customer == null ? null : customer.getId());
             fxmlLoader.setController(payController);
-            resetOrderDetail=false;
+            resetOrderDetail = false;
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
             stage.setTitle("Thêm khách hàng");

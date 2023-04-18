@@ -5,6 +5,7 @@
 package com.ktpm.app;
 
 import com.ktpm.pojo.Customer;
+import com.ktpm.services.CustomerService;
 import com.ktpm.services.impl.CustomerServiceImpl;
 import com.ktpm.utils.Utils;
 import java.net.URL;
@@ -46,7 +47,7 @@ public class FXMLCustomerController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
     }
-    
+
     public void resetField() {
         textFieldName.setText("");
         textFieldNumber.setText("");
@@ -64,15 +65,19 @@ public class FXMLCustomerController implements Initializable {
         String name = textFieldName.getText().trim();
         String number = textFieldNumber.getText().trim();
         LocalDate birthday = datePickerBirthday.getValue();
-        if ("".equals(name) || "".equals(number) || birthday == null) {
-            Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR).showAndWait();
-        } else if (!name.matches("[\\p{L}\\s]+")) {
-            Utils.getBox("Lỗi", "Tên không được chứa số hoặc ký tự đặc biệt", "", Alert.AlertType.ERROR).showAndWait();
-        } else if (!number.matches("^0\\d{9}$")) {
-            Utils.getBox("Lỗi", "Lỗi nhập liệu", "Lỗi nhập SDT", Alert.AlertType.ERROR).showAndWait();
-        } else if (!Date.valueOf(birthday).before(Date.valueOf(LocalDate.now()))) {
-            Utils.getBox("Lỗi", "Ngày sinh không đúng", "Vui lòng chọn ngày sinh trước ngày hiện tại", Alert.AlertType.ERROR).showAndWait();
-        } else {
+        if (Utils.checkName(name) && Utils.checkNumber(number) && Utils.checkBirthday(birthday)) {
+            CustomerService customerService = new CustomerServiceImpl();
+            Customer existCustomer;
+            try {
+                existCustomer = customerService.getCustomerByNumber(number);
+                if (existCustomer != null) {
+                    Utils.getBox("Thất bại", "Trùng số điện thoại", "Đã có số điện thoại này", Alert.AlertType.ERROR).showAndWait();
+                    return false;
+                }
+            } catch (SQLException ex) {
+                Utils.getBox("Thất bại", "Có lỗi", "Lỗi kết nối cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
+                return false;
+            }
             return true;
         }
         return false;
@@ -83,7 +88,7 @@ public class FXMLCustomerController implements Initializable {
         if (checkValid()) {
             getCustomerInField(customer);
             try {
-                CustomerServiceImpl customerService = new CustomerServiceImpl();
+                CustomerService customerService = new CustomerServiceImpl();
                 customerService.addCustomer(customer);
                 Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
                 resetField();

@@ -63,7 +63,6 @@ public class FXMLDiscountManagerController implements Initializable {
     @FXML
     private TextField textFieldPercent;
 
-    final private ProductService productService = new ProductServiceImpl();
     final private DiscountService discountService = new DiscountServiceImpl();
     private final ObservableList<Product> productTableData = FXCollections.observableArrayList();
     private final ObservableList<Discount> discountTableData = FXCollections.observableArrayList();
@@ -90,12 +89,13 @@ public class FXMLDiscountManagerController implements Initializable {
     public void loadColumns() {
         TableColumn<Discount, ?> idColumn = new TableColumn<>("Mã giảm giá");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
-        
+
         TableColumn<Discount, String> productNameColumn = new TableColumn<>("Sản phẩm");
         productNameColumn.setCellValueFactory(cellData -> {
             int productId = cellData.getValue().getProductId();
             String productName = "";
             try {
+                ProductService productService = new ProductServiceImpl();
                 productName = productService.getProductById(productId).toString();
             } catch (SQLException ex) {
                 Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -111,7 +111,7 @@ public class FXMLDiscountManagerController implements Initializable {
 
         TableColumn<Discount, ?> percentColumn = new TableColumn<>("Giảm(%)");
         percentColumn.setCellValueFactory(new PropertyValueFactory<>("discountPercent"));
-        tableDiscount.getColumns().addAll(idColumn,productNameColumn, startColumn, endColumn, percentColumn);
+        tableDiscount.getColumns().addAll(idColumn, productNameColumn, startColumn, endColumn, percentColumn);
         TableColumn<Discount, Void> actionColumn = new TableColumn<>("Hành động");
         actionColumn.setCellFactory(param -> new ButtonCell());
         actionColumn.setPrefWidth(300);
@@ -121,6 +121,7 @@ public class FXMLDiscountManagerController implements Initializable {
     public void onLoad() {
         loadColumns();
         try {
+            ProductService productService = new ProductServiceImpl();
             List<Product> products = productService.getAllProducts();
             productTableData.addAll(products);
             comboBoxProduct.setItems(productTableData);
@@ -165,14 +166,29 @@ public class FXMLDiscountManagerController implements Initializable {
         Product product = comboBoxProduct.getValue();
         LocalDate startDate = datePickerStartDate.getValue();
         LocalDate endDate = datePickerEndDate.getValue();
-        String percent = textFieldPercent.getText();
-        if (product == null || "".equals(percent)) {
-            Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đủ thông tin", Alert.AlertType.ERROR).showAndWait();
-        } else if (startDate == null || endDate == null) {
-            Utils.getBox("Lỗi", "Lỗi nhập liệu", "Vui lòng nhập đúng định dạng ngày tháng (MM/dd/yyyy)", Alert.AlertType.ERROR).showAndWait();
-        } else if (discountTableData.stream().anyMatch(d -> !(id == d.getId()) && product.getId() == d.getProductId() && d.getStartDate().equals(Date.valueOf(startDate)) && d.getEndDate().equals(Date.valueOf(endDate)))) {
-            Utils.getBox("Lỗi", "Thêm thất bại", "Đã có giảm giá này", Alert.AlertType.ERROR).showAndWait();
-        } else {
+        String percentText = textFieldPercent.getText();
+        if (Utils.checkEmpty(product) && Utils.checkEmpty(startDate) && Utils.checkEmpty(endDate) && Utils.checkEmpty(percentText)) {
+            if (startDate.isAfter(endDate)) {
+                Utils.getBox("Lỗi", "Thêm thất bại", "Ngày bắt đầu phải trước ngày kết thúc", Alert.AlertType.ERROR).showAndWait();
+                return false;
+            }
+            boolean conflictDiscount = discountTableData.stream().anyMatch(d -> !(id == d.getId()) && product.getId() == d.getProductId()
+                    && ((d.getStartDate().before(Date.valueOf(startDate)) && d.getEndDate().after(Date.valueOf(endDate))
+                    || (d.getStartDate().after(Date.valueOf(startDate)) && d.getEndDate().before(Date.valueOf(endDate)))
+                    || (d.getStartDate().equals(Date.valueOf(startDate)) && d.getEndDate().equals(Date.valueOf(endDate))))));
+            if (conflictDiscount) {
+                Utils.getBox("Lỗi", "Thêm thất bại", "Đã có giảm giá này hoặc trong thời gian của mã giảm giá khác", Alert.AlertType.ERROR).showAndWait();
+                return false;
+            } else try {
+                Double percent = Double.valueOf(percentText);
+                if (percent < 0 || percent > 100) {
+                    Utils.getBox("Lỗi", "Thêm thất bại", "Phần trăm giảm giá phải lớn hơn 0 và nhỏ hơn 100", Alert.AlertType.ERROR).showAndWait();
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                Utils.getBox("Lỗi", "Sai số lượng", "Vui lòng nhập đúng số lượng", Alert.AlertType.ERROR).showAndWait();
+                return false;
+            }
             return true;
         }
         return false;
@@ -210,14 +226,14 @@ public class FXMLDiscountManagerController implements Initializable {
             this.editButton.setDisable(false);
             this.deleteButton.setDisable(false);
         }
-        
+
         private void beforeCommit() {
             editButton.setText("Cập nhật");
             deleteButton.setText("Hủy bỏ");
             btnAdd.setDisable(true);
             setButton(true);
         }
-        
+
         private void afterCommitOrCancel() {
             resetField();
             setButton(false);
@@ -240,7 +256,7 @@ public class FXMLDiscountManagerController implements Initializable {
                     afterCommitOrCancel();
                 });
                 editButton.setOnAction(commitEvent -> {
-                    if (checkValid(discount.getId())){
+                    if (checkValid(discount.getId())) {
                         getDiscountInField(discount);
                         try {
                             discountService.updateDiscount(discount);
@@ -258,8 +274,8 @@ public class FXMLDiscountManagerController implements Initializable {
                 Alert alert = Utils.getBox("Xác nhận xóa", "Bạn có chắc chắn muốn xóa?", " Mã sẽ bị xóa vĩnh viễn.", Alert.AlertType.CONFIRMATION);
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.isPresent() && result.get() == ButtonType.OK) {
-                    try { 
-                        
+                    try {
+
                         discountService.deleteDiscount(discount.getId());
                         discountTableData.remove(discount);
                         Utils.getBox("Thành công", "", "Xóa thành công", Alert.AlertType.INFORMATION).showAndWait();
