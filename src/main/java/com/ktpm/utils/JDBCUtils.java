@@ -9,26 +9,37 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.control.Alert;
 
 /**
  *
  * @author ad
  */
 public class JDBCUtils {
+
     static {
         try {
             // B1 Nap driver
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(JDBCUtils.class.getName()).log(Level.SEVERE, null, ex);
+            Utils.getBox("Lỗi", "", "Không thể nạp driver", Alert.AlertType.ERROR).showAndWait();
         }
     }
-    public static Connection getConn() throws SQLException {
-        // B2 Thiet lap ket noi
-        return DriverManager.getConnection("jdbc:mysql://localhost/supermarket", "root", "Admin@123");
+
+    public static Connection getConn() {
+        try {
+            // B2 Thiet lap ket noi
+            return DriverManager.getConnection("jdbc:mysql://localhost/supermarket", "root", "Admin@123");
+        } catch (SQLException ex) {
+            Utils.getBox("Lỗi", "", "Connection String không chính xác hoặc lỗi kết nối tới Database", Alert.AlertType.ERROR).showAndWait();
+        }
+        return null;
     }
-     public static Connection getTestConn() throws SQLException {
+
+    public static Connection getTestConn() throws SQLException {
         // B2 Thiet lap ket noi
         return DriverManager.getConnection("jdbc:mysql://localhost/testdb", "root", "Admin@123");
+
     }
+
 }

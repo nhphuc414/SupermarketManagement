@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.net.URL?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DatePicker?>
@@ -12,12 +12,9 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.SearchableComboBox?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLEmployeeManagerController">
-   <stylesheets>
-      <URL value="@/styles/fxmlbranchmanager.css" />
-   </stylesheets>
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" stylesheets="@../../../styles/fxmlstyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLEmployeeManagerController">
    <children>
-      <AnchorPane layoutY="120.0" prefHeight="580.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="120.0">
+      <AnchorPane layoutY="120.0" prefHeight="580.0" prefWidth="500.0" styleClass="left-anchor" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="120.0">
          <children>
             <Label layoutX="20.0" layoutY="78.0" text="Họ tên">
                <font>
@@ -59,7 +56,7 @@
                   <Font size="18.0" />
                </font>
             </Label>
-            <SearchableComboBox fx:id="comboBoxBranch" layoutX="186.0" layoutY="16.0" prefHeight="39.0" prefWidth="300.0" />
+            <SearchableComboBox fx:id="comboBoxBranch" layoutX="186.0" layoutY="16.0" prefHeight="39.0" prefWidth="300.0" styleClass="combobox" />
             <TextField fx:id="textFieldName" layoutX="186.0" layoutY="72.0" prefHeight="25.0" prefWidth="300.0">
                <font>
                   <Font size="18.0" />
@@ -78,19 +75,35 @@
             </TextField>
             <PasswordField fx:id="textFieldPassword" layoutX="186.0" layoutY="297.0" prefHeight="39.0" prefWidth="300.0" />
             <PasswordField fx:id="textFieldConfirm" layoutX="186.0" layoutY="353.0" prefHeight="39.0" prefWidth="300.0" />
-            <ComboBox fx:id="comboboxRole" layoutX="186.0" layoutY="420.0" prefHeight="39.0" prefWidth="300.0" />
-            <Button fx:id="btnAdd" layoutX="410.0" layoutY="527.0" mnemonicParsing="false" onAction="#addEmployee" prefHeight="39.0" prefWidth="88.0" text="Thêm " AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
-            <Button mnemonicParsing="false" onAction="#returnMain" prefHeight="39.0" prefWidth="88.0" text="Trở về" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+            <ComboBox fx:id="comboboxRole" layoutX="186.0" layoutY="420.0" prefHeight="39.0" prefWidth="300.0" styleClass="combobox" />
+            <Button fx:id="btnAdd" layoutX="410.0" layoutY="527.0" mnemonicParsing="false" onAction="#addEmployee" prefHeight="39.0" prefWidth="88.0" styleClass="button-other" text="Thêm " AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <Button fx:id="btnDelete" layoutX="292.0" layoutY="541.0" mnemonicParsing="false" onAction="#resetField" prefHeight="39.0" prefWidth="88.0" styleClass="button-other" text="Xóa" AnchorPane.bottomAnchor="0.0" />
+            <Button fx:id="btnReturn" mnemonicParsing="false" onAction="#returnMain" prefHeight="39.0" prefWidth="88.0" styleClass="button-return" text="Trở về" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
          </children>
       </AnchorPane>
       <AnchorPane id="AnchorPane" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="580.0" prefWidth="780.0" styleClass="mainFxmlClass" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
-         <stylesheets>
-            <URL value="@/styles/fxmlbranchmanager.css" />
-         </stylesheets>
          <children>
-            <TableView fx:id="tableEmployee" layoutX="157.0" layoutY="79.0" prefHeight="580.0" prefWidth="780.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <TableView fx:id="tableEmployee" layoutX="157.0" layoutY="79.0" prefHeight="580.0" prefWidth="780.0" styleClass="tableview-style" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="250.0" layoutY="7.0" prefHeight="120.0" prefWidth="1280.0" AnchorPane.bottomAnchor="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+      <AnchorPane layoutX="260.0" layoutY="17.0" prefHeight="120.0" prefWidth="1280.0" styleClass="top-anchor" AnchorPane.bottomAnchor="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <AnchorPane layoutX="839.0" layoutY="1.0" prefHeight="120.0" prefWidth="441.0" styleClass="name-anchor" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Label layoutX="16.0" layoutY="14.0" prefHeight="17.0" prefWidth="153.0" text="Chào Mừng, " AnchorPane.leftAnchor="16.0">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                  </Label>
+                  <Label fx:id="labelName" layoutX="21.0" layoutY="57.0" prefHeight="46.0" prefWidth="300.0" styleClass="name-label" text="User" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="21.0">
+                     <font>
+                        <Font size="25.0" />
+                     </font>
+                  </Label>
+                  <FontAwesomeIconView glyphName="USER" layoutX="328.0" layoutY="96.0" size="9em" text="" wrappingWidth="78.0" />
+               </children>
+            </AnchorPane>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>

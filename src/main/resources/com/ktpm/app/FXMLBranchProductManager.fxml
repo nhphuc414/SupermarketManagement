@@ -7,41 +7,44 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
+<?import org.controlsfx.control.SearchableComboBox?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" stylesheets="@../../../styles/fxmlstyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLBranchManagerController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="700.0" prefWidth="1280.0" styleClass="mainFxmlClass" stylesheets="@../../../styles/fxmlstyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLBranchProductManagerController">
    <children>
       <AnchorPane layoutY="120.0" prefHeight="580.0" prefWidth="500.0" styleClass="left-anchor" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="120.0">
          <children>
-            <Label layoutX="20.0" layoutY="142.0" text="Tên chi nhánh">
+            <Label layoutX="16.0" layoutY="135.0" text="Sản phẩm">
                <font>
-                  <Font size="21.0" />
+                  <Font size="18.0" />
                </font>
             </Label>
-            <Label layoutX="20.0" layoutY="211.0" text="Địa chỉ">
+            <Label layoutX="20.0" layoutY="211.0" text="Số lượng">
                <font>
-                  <Font size="21.0" />
+                  <Font size="18.0" />
                </font>
             </Label>
-            <TextField fx:id="textFieldName" layoutX="186.0" layoutY="136.0" prefHeight="25.0" prefWidth="300.0" styleClass="text-field">
+            <Label layoutX="20.0" layoutY="70.0" text="Chi nhánh">
+               <font>
+                  <Font size="18.0" />
+               </font>
+            </Label>
+            <SearchableComboBox fx:id="comboBoxBranch" layoutX="186.0" layoutY="64.0" prefHeight="39.0" prefWidth="300.0" styleClass="combobox" />
+            <SearchableComboBox fx:id="comboBoxProduct" layoutX="186.0" layoutY="129.0" prefHeight="39.0" prefWidth="300.0" styleClass="combobox" />
+            <TextField fx:id="textFieldQuantity" layoutX="186.0" layoutY="205.0" prefHeight="39.0" prefWidth="300.0">
                <font>
                   <Font size="18.0" />
                </font>
             </TextField>
-            <TextField fx:id="textFieldAddress" layoutX="186.0" layoutY="205.0" prefHeight="39.0" prefWidth="300.0" styleClass="text-field">
-               <font>
-                  <Font size="18.0" />
-               </font>
-            </TextField>
-            <Button fx:id="btnAdd" layoutX="398.0" layoutY="290.0" mnemonicParsing="false" onAction="#addBranch" prefHeight="39.0" prefWidth="88.0" styleClass="button-other" text="Thêm " AnchorPane.bottomAnchor="251.0" AnchorPane.rightAnchor="14.0" />
+            <Button fx:id="btnAdd" layoutX="398.0" layoutY="290.0" mnemonicParsing="false" onAction="#addBranchProduct" prefHeight="39.0" prefWidth="88.0" styleClass="button-other" text="Thêm " AnchorPane.bottomAnchor="251.0" AnchorPane.rightAnchor="14.0" />
             <Button fx:id="btnReturn" layoutX="163.0" layoutY="350.0" mnemonicParsing="false" onAction="#returnMain" prefHeight="39.0" prefWidth="88.0" styleClass="button-return" text="Trở về" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
          </children>
       </AnchorPane>
-      <AnchorPane id="AnchorPane" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="580.0" prefWidth="780.0" styleClass="mainFxmlClass" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
+      <AnchorPane id="AnchorPane" layoutX="10.0" layoutY="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="580.0" prefWidth="780.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="500.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="120.0">
          <children>
-            <TableView fx:id="tableBranch" layoutX="157.0" layoutY="79.0" prefHeight="580.0" prefWidth="780.0" styleClass="tableview-style" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" />
+            <TableView fx:id="tableBranchProduct" layoutX="157.0" layoutY="79.0" prefHeight="580.0" prefWidth="780.0" styleClass="tableview-style" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="250.0" layoutY="7.0" prefHeight="120.0" prefWidth="1280.0" styleClass="top-anchor" AnchorPane.bottomAnchor="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <AnchorPane layoutX="260.0" layoutY="17.0" prefHeight="120.0" prefWidth="1280.0" styleClass="top-anchor" AnchorPane.bottomAnchor="580.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <AnchorPane layoutX="839.0" layoutY="1.0" prefHeight="120.0" prefWidth="441.0" styleClass="name-anchor" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
@@ -58,6 +61,7 @@
                   <FontAwesomeIconView glyphName="USER" layoutX="328.0" layoutY="96.0" size="9em" text="" wrappingWidth="78.0" />
                </children>
             </AnchorPane>
-         </children></AnchorPane>
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>
