@@ -34,11 +34,7 @@ public class DiscountServiceTest {
     
     @BeforeAll
     public static void setUpClass() throws SQLException {
-        try {
-            conn = JDBCUtils.getConn();
-        } catch (SQLException ex) {
-            Logger.getLogger(DiscountServiceTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        conn = JDBCUtils.getConn();
         
     }
     @AfterAll

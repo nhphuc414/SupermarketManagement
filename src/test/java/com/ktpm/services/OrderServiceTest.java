@@ -35,11 +35,8 @@ public class OrderServiceTest {
     
     @BeforeAll
     public static void setUpClass() throws SQLException {
-        try {
             conn = JDBCUtils.getConn();
-        } catch (SQLException ex) {
-            Logger.getLogger(OrderServiceTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        
         
     }
     @AfterAll
