@@ -291,7 +291,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             List<Discount> discounts = discountService.getDiscountsByProductId(productId);
             for (Discount discount : discounts) {
                 if (discount.getStartDate().before(Date.valueOf(LocalDate.now())) && discount.getEndDate().after(Date.valueOf(LocalDate.now()))) {
-                    return price * (100-discount.getDiscountPercent());
+                    return price * (100-discount.getDiscountPercent())/100;
                 }
             }
         } catch (SQLException ex) {

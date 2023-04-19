@@ -103,12 +103,10 @@ public class FXMLPayController implements Initializable {
                 if (number < total) {
                     Utils.getBox("Lỗi", "", "Tiền khách nhập nhỏ hơn tổng tiền phải trả", Alert.AlertType.ERROR).showAndWait();
                     return false;
-                }
+                } else return true;
             } catch (NumberFormatException e) {
                 Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đúng số tiền", Alert.AlertType.ERROR).showAndWait();
-                return false;
             }
-            return true;
         }
         return false;
     }
@@ -117,7 +115,7 @@ public class FXMLPayController implements Initializable {
         try {
             double number = Double.parseDouble(textFieldPriceFromCustomer.getText());
             if (number < total) {
-                labelpriceChange.setText("Tiền khách nhập nhỏ hơn tổng tiền phải trả");
+                labelpriceChange.setText("Tiền nhận từ khách nhỏ hơn tổng tiền phải trả");
 
             } else {
                 labelpriceChange.setText(Utils.df.format(number-total));
