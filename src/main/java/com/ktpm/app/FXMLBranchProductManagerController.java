@@ -17,6 +17,7 @@ import com.ktpm.utils.Utils;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -27,14 +28,19 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.ESCAPE;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import org.controlsfx.control.SearchableComboBox;
 
@@ -46,7 +52,12 @@ import org.controlsfx.control.SearchableComboBox;
 public class FXMLBranchProductManagerController implements Initializable {
 
     @FXML
+    private Label labelName;
+    
+    @FXML
     private Button btnAdd;
+    @FXML
+    private Button btnReturn;
 
     @FXML
     private SearchableComboBox<Branch> comboBoxBranch;
@@ -59,6 +70,7 @@ public class FXMLBranchProductManagerController implements Initializable {
 
     @FXML
     private TextField textFieldQuantity;
+
     private final ProductService productService = new ProductServiceImpl();
     private final BranchService branchService = new BranchServiceImpl();
     private final BranchProductService branchProductService = new BranchProductServiceImpl();
@@ -75,6 +87,64 @@ public class FXMLBranchProductManagerController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         onLoad();
+    }
+
+    public void onLoad() {
+        addEnterEvent(btnAdd, btnReturn);
+        loadColumns();
+        labelName.setText(App.getCurrentEmployee().getEmployeeName());
+        try {
+            //Load branches
+            List<Branch> branches = branchService.getAllBranches();
+            branchTableData.addAll(branches);
+            //Load product
+            List<Product> products = productService.getAllProducts();
+            productTableData.addAll(products);
+            comboBoxBranch.setItems(branchTableData);
+            comboBoxProduct.setItems(productTableData);
+            List<BranchProduct> branchProducts = branchProductService.getAllBranchProducts();
+            branchProductTableData.addAll(branchProducts);
+            tableBranchProduct.setItems(branchProductTableData);
+        } catch (SQLException ex) {
+            Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
+        }
+    }
+
+    private EventHandler<KeyEvent> addEnterEvent(Button add, Button esc) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldQuantity);
+        nodeList.add(comboBoxBranch);
+        nodeList.add(comboBoxProduct);
+        EventHandler<KeyEvent> eventHandler = event -> {
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case ENTER:
+                        event.consume();
+                        add.fire();
+                        break;
+                    case ESCAPE:
+                        event.consume();
+                        esc.fire();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        for (Node node : nodeList) {
+            node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
+        return eventHandler;
+    }
+
+    private void removeEnterEvent(EventHandler<KeyEvent> eventHandler) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldQuantity);
+        nodeList.add(comboBoxBranch);
+        nodeList.add(comboBoxProduct);
+        for (Node node : nodeList) {
+            node.removeEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
     }
 
     public void returnMain(ActionEvent event) {
@@ -123,34 +193,9 @@ public class FXMLBranchProductManagerController implements Initializable {
         tableBranchProduct.getColumns().add(actionColumn);
     }
 
-    public void onLoad() {
-        loadColumns();
-        try {
-            //Load branches
-            List<Branch> branches = branchService.getAllBranches();
-            for (Branch branch : branches) {
-                branchTableData.add(branch);
-            }
-            //Load product
-            List<Product> products = productService.getAllProducts();
-            for (Product product : products) {
-                productTableData.add(product);
-            }
-            comboBoxBranch.setItems(branchTableData);
-            comboBoxBranch.setValue(branchTableData.get(0));
-            comboBoxProduct.setItems(productTableData);
-            comboBoxProduct.setValue(productTableData.get(0));
-            List<BranchProduct> branchProducts = branchProductService.getAllBranchProducts();
-            branchProductTableData.addAll(branchProducts);
-            tableBranchProduct.setItems(branchProductTableData);
-        } catch (SQLException ex) {
-            Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
-        }
-    }
-
     public void resetField() {
-        comboBoxBranch.setValue(branchTableData.get(0));
-        comboBoxProduct.setValue(productTableData.get(0));
+        comboBoxBranch.setValue(null);
+        comboBoxProduct.setValue(null);
         textFieldQuantity.setText("");
         textFieldQuantity.requestFocus();
     }
@@ -192,11 +237,11 @@ public class FXMLBranchProductManagerController implements Initializable {
             BranchProduct branchProduct = new BranchProduct();
             getBranchProductInField(branchProduct);
             try {
-                BranchProduct existBranchProduct=null;
-                for(BranchProduct bp:branchProductTableData){
-                    if (bp.getBranchId().equals(branchProduct.getBranchId())&&bp.getProductId()==branchProduct.getProductId()){
-                       existBranchProduct=bp;
-                       break;
+                BranchProduct existBranchProduct = null;
+                for (BranchProduct bp : branchProductTableData) {
+                    if (bp.getBranchId().equals(branchProduct.getBranchId()) && bp.getProductId() == branchProduct.getProductId()) {
+                        existBranchProduct = bp;
+                        break;
                     }
                 }
                 if (existBranchProduct != null) {
@@ -224,6 +269,7 @@ public class FXMLBranchProductManagerController implements Initializable {
         private final Button deleteButton = new Button("Xóa");
         private EventHandler<ActionEvent> originalEditEvent;
         private EventHandler<ActionEvent> originalDeleteEvent;
+        private EventHandler<KeyEvent> eventEnter;
 
         private void setButton(Boolean value) {
             tableBranchProduct.lookupAll("Button").forEach(node -> {
@@ -240,13 +286,21 @@ public class FXMLBranchProductManagerController implements Initializable {
             editButton.setText("Cập nhật");
             deleteButton.setText("Hủy bỏ");
             btnAdd.setDisable(true);
+            btnReturn.setDisable(true);
+            comboBoxBranch.setDisable(true);
+            comboBoxProduct.setDisable(true);
+            eventEnter = addEnterEvent(this.editButton, this.deleteButton);
             setButton(true);
         }
 
         private void afterCommitOrCancel() {
             resetField();
             setButton(false);
+            removeEnterEvent(eventEnter);
             btnAdd.setDisable(false);
+            btnReturn.setDisable(false);
+            comboBoxBranch.setDisable(false);
+            comboBoxProduct.setDisable(false);
             editButton.setText("Sửa");
             deleteButton.setText("Xóa");
             editButton.setOnAction(originalEditEvent);
@@ -269,11 +323,10 @@ public class FXMLBranchProductManagerController implements Initializable {
                         try {
                             branchProductService.updateBranchProduct(branchProduct);
                             tableBranchProduct.refresh();
-                            comboBoxBranch.setDisable(false);
-                            comboBoxProduct.setDisable(false);
+
                             Utils.getBox("Thành công", "", "Cập nhật thành công", Alert.AlertType.INFORMATION).showAndWait();
                             afterCommitOrCancel();
-                            
+
                         } catch (SQLException ex) {
                             Utils.getBox("Sửa thất bại", "Không sửa được", "Có lỗi với cơ sở dữ liệu", Alert.AlertType.ERROR).showAndWait();
 

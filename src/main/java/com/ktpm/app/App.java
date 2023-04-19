@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
 
+
 /**
  * JavaFX App
  */
@@ -16,6 +17,7 @@ public class App extends Application {
 
     private static Scene scene;
     private static Employee currentEmployee;
+
     public static Employee getCurrentEmployee() {
         return currentEmployee;
     }
@@ -23,6 +25,7 @@ public class App extends Application {
     public static void setCurrentEmployee(Employee employee) {
         currentEmployee = employee;
     }
+
     @Override
     public void start(Stage stage) throws IOException {
         scene = new Scene(loadFXML("FXMLLogin"));
@@ -37,7 +40,8 @@ public class App extends Application {
         stage.centerOnScreen();
         stage.show();
     }
-    static void setRoot(String fxml,String title) throws IOException {
+
+    static void setRoot(String fxml, String title) throws IOException {
         scene.setRoot(loadFXML(fxml));
         Stage currentStage = (Stage) scene.getWindow();
         currentStage.sizeToScene();

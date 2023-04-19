@@ -16,6 +16,7 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -26,15 +27,21 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.ESCAPE;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import org.controlsfx.control.SearchableComboBox;
 
@@ -46,7 +53,13 @@ import org.controlsfx.control.SearchableComboBox;
 public class FXMLDiscountManagerController implements Initializable {
 
     @FXML
+    private Label labelName;
+    
+    @FXML
     private Button btnAdd;
+    
+    @FXML
+    private Button btnReturn;
 
     @FXML
     private SearchableComboBox<Product> comboBoxProduct;
@@ -77,7 +90,51 @@ public class FXMLDiscountManagerController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         onLoad();
     }
-
+    private EventHandler<KeyEvent> addEnterEvent(Button add, Button esc) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldPercent);
+        nodeList.add(comboBoxProduct);
+        EventHandler<KeyEvent> eventHandler = event -> {
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case ENTER:
+                        event.consume();
+                        add.fire();
+                        break;
+                    case ESCAPE:
+                        event.consume();
+                        esc.fire();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        for (Node node : nodeList) {
+            node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
+        datePickerStartDate.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) ->{
+            if (event.getCode()==KeyCode.ESCAPE){
+                event.consume();
+                        esc.fire();
+            }
+        });
+        datePickerEndDate.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) ->{
+            if (event.getCode()==KeyCode.ESCAPE){
+                event.consume();
+                        esc.fire();
+            }
+        });
+        return eventHandler;
+    }
+    private void removeEnterEvent(EventHandler<KeyEvent> eventHandler) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(tableDiscount);
+        nodeList.add(textFieldPercent);
+        for (Node node : nodeList) {
+            node.removeEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
+    }
     public void returnMain(ActionEvent event) {
         try {
             App.setRoot("FXMLAdminMenu", "Supermarket Manager");
@@ -121,12 +178,12 @@ public class FXMLDiscountManagerController implements Initializable {
 
     public void onLoad() {
         loadColumns();
+        labelName.setText(App.getCurrentEmployee().getEmployeeName());
+        addEnterEvent(btnAdd, btnReturn);
         try {
             List<Product> products = productService.getAllProducts();
             productTableData.addAll(products);
             comboBoxProduct.setItems(productTableData);
-            comboBoxProduct.setValue(productTableData.get(0));
-            
             List<Discount> discounts = discountService.getAllDiscounts();
             discountTableData.addAll(discounts);
             tableDiscount.setItems(discountTableData);
@@ -214,6 +271,7 @@ public class FXMLDiscountManagerController implements Initializable {
         private final Button deleteButton = new Button("Xóa");
         EventHandler<ActionEvent> originalEditEvent;
         EventHandler<ActionEvent> originalDeleteEvent;
+        private EventHandler<KeyEvent> eventEnter;
 
         private void setButton(Boolean value) {
             tableDiscount.lookupAll("Button").forEach(node -> {
@@ -230,13 +288,17 @@ public class FXMLDiscountManagerController implements Initializable {
             editButton.setText("Cập nhật");
             deleteButton.setText("Hủy bỏ");
             btnAdd.setDisable(true);
+            btnReturn.setDisable(true);
+            eventEnter=addEnterEvent(this.editButton, this.deleteButton);
             setButton(true);
         }
 
         private void afterCommitOrCancel() {
             resetField();
             setButton(false);
+            removeEnterEvent(eventEnter);
             btnAdd.setDisable(false);
+            btnReturn.setDisable(false);
             editButton.setText("Sửa");
             deleteButton.setText("Xóa");
             editButton.setOnAction(originalEditEvent);

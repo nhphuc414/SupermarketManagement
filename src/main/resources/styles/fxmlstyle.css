@@ -1,0 +1,96 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Apr 19, 2023, 2:02:58 PM
+    Author     : ad
+*/
+
+.top-anchor {
+    -fx-background-color: #FAD961;
+    -fx-background-color:#f2f2f2;
+    -fx-border-width:0 0 2px 0;
+    -fx-border-color:black;
+}
+.left-anchor{
+    -fx-background-color:#dddddd;
+    -fx-border-width: 0 2px 0 0;
+    -fx-border-color:black;
+}
+.name-anchor{
+    -fx-background-color:linear-gradient(to right bottom, #Efdfdf, #80D0C7  );
+    -fx-border-width:0 0px 0 2px;
+    -fx-border-color:black;
+}
+.name-label{
+    -fx-font-family: 'Arial';
+    -fx-font-size: 25px;
+    -fx-font-weight: bold;
+    -fx-text-align: right;
+    -fx-text-fill: #333333;
+}
+.text-field{
+    -fx-border-color:#000;
+    -fx-background-radius:4px;
+    -fx-border-width:.9px;
+    -fx-border-radius:4px;
+}
+.text-field:hover{
+    -fx-border-width: 2;
+    -fx-border-color: #909090;
+}
+.text-field:focused{
+    -fx-border-width: 1.5;
+    -fx-border-color: #000000;
+}
+.button-other{
+    -fx-border-radius: 5px;
+    -fx-border-color:black;
+    -fx-border-width:0.8px;
+}
+.button-other:hover {
+    -fx-border-width: 2;
+    -fx-border-color: #909090;
+
+}
+.button-other:pressed {
+    -fx-scale-y: 0.9;
+    -fx-scale-x: 0.9;
+}
+
+.button-return {
+    -fx-border-radius: 0 5px 0 0 ;
+    -fx-border-color:black;
+    -fx-border-width:1px;
+}
+.button-return:hover {
+    -fx-border-width: 2;
+    -fx-border-color: #909090;
+}
+.button-return:pressed {
+    -fx-scale-y: 1.3;
+}
+.label-pay{
+    -fx-border-radius: 1px 1px 1px 1px ;
+    -fx-border-color:black;
+    -fx-border-width:1px;
+}
+.left-login-anchor{
+    -fx-background-color:linear-gradient(to right bottom, #Dddfdf, #80D0C7  );
+    -fx-border-width: 1px 1px 1px 1px;
+    -fx-border-color:black;
+}
+.right-login-anchor{
+    -fx-background-color:#dddddd;
+    -fx-border-width: 1px 0 1px 1px;
+    -fx-border-color:black;
+}
+.tableview-style{
+    -fx-background-color:#FfFfff;
+}
+.combobox{
+    -fx-border-color:#000;
+    -fx-border-width:.9px;
+    -fx-border-radius:2px;
+}

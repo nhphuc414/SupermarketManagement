@@ -24,9 +24,11 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 /**
@@ -35,6 +37,13 @@ import javafx.stage.Stage;
  * @author ad
  */
 public class FXMLPayController implements Initializable {
+
+    @FXML
+    Button btnAdd;
+    @FXML
+    Button btnDelete;
+    @FXML
+    Button btnReturn;
 
     @FXML
     private Label labelpriceChange;
@@ -57,10 +66,35 @@ public class FXMLPayController implements Initializable {
         onLoad();
     }
 
+    public void addEnterEvent() {
+        textFieldPriceFromCustomer.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case ENTER:
+                        btnAdd.fire();
+                        event.consume();
+                        break;
+                    case ESCAPE:
+                        btnReturn.fire();
+                        event.consume();
+                        break;
+                    case DELETE:
+                        btnDelete.fire();
+                        event.consume();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+    }
+
     public void onLoad() {
+        addEnterEvent();
         labelpricePay.setText(Utils.df.format(total));
         labelpriceChange.setText("0");
     }
+
     public boolean checkValid() {
         String priceFromCustomer = textFieldPriceFromCustomer.getText();
         if (Utils.checkEmpty(priceFromCustomer)) {
@@ -69,7 +103,7 @@ public class FXMLPayController implements Initializable {
                 if (number < total) {
                     Utils.getBox("Lỗi", "", "Tiền khách nhập nhỏ hơn tổng tiền phải trả", Alert.AlertType.ERROR).showAndWait();
                     return false;
-                } 
+                }
             } catch (NumberFormatException e) {
                 Utils.getBox("Lỗi", "Không đủ thông tin", "Vui lòng nhập đúng số tiền", Alert.AlertType.ERROR).showAndWait();
                 return false;
@@ -77,6 +111,20 @@ public class FXMLPayController implements Initializable {
             return true;
         }
         return false;
+    }
+
+    public void checkChange() {
+        try {
+            double number = Double.parseDouble(textFieldPriceFromCustomer.getText());
+            if (number < total) {
+                labelpriceChange.setText("Tiền khách nhập nhỏ hơn tổng tiền phải trả");
+
+            } else {
+                labelpriceChange.setText(Utils.df.format(number-total));
+            }
+        } catch (NumberFormatException e) {
+            labelpriceChange.setText("Nhập sai");
+        }
     }
 
     public void addOrder() {
@@ -93,10 +141,10 @@ public class FXMLPayController implements Initializable {
                     orderDetail.setOrderId(order.getId());
                     orderDetailService.addOrderDetail(orderDetail);
                     BranchProduct updateBranchProduct = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), orderDetail.getProductId());
-                    updateBranchProduct.setQuantity(updateBranchProduct.getQuantity()-orderDetail.getQuantity());
+                    updateBranchProduct.setQuantity(updateBranchProduct.getQuantity() - orderDetail.getQuantity());
                     branchProductService.updateBranchProduct(updateBranchProduct);
                 }
-                Utils.getBox("Thành công", "", "Thêm thành công", Alert.AlertType.INFORMATION).showAndWait();
+                Utils.getBox("Thành công", "", "Xuất hóa đơn thành công", Alert.AlertType.INFORMATION).showAndWait();
                 FXMLEmployeeMenuController.resetOrderDetail = true;
                 Stage stage = (Stage) labelpriceChange.getScene().getWindow();
                 stage.close();

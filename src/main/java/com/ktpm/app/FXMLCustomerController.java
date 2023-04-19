@@ -12,14 +12,22 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.ESCAPE;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 /**
@@ -28,6 +36,14 @@ import javafx.stage.Stage;
  * @author ad
  */
 public class FXMLCustomerController implements Initializable {
+    @FXML
+    private Button btnAdd;
+
+    @FXML
+    private Button btnDelete;
+
+    @FXML
+    private Button btnReturn;
 
     @FXML
     private DatePicker datePickerBirthday;
@@ -47,15 +63,47 @@ public class FXMLCustomerController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        addEnterEvent(btnAdd, btnReturn);
     }
-
+    private void addEnterEvent(Button add, Button esc) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldName);
+        nodeList.add(textFieldNumber);
+        EventHandler<KeyEvent> eventHandler = event -> {
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case ENTER:
+                        event.consume();
+                        add.fire();
+                        break;
+                    case ESCAPE:
+                        event.consume();
+                        esc.fire();
+                        break;
+                    case DELETE:
+                        event.consume();
+                        btnDelete.fire();
+                    default:
+                        break;
+                }
+            }
+        };
+        for (Node node : nodeList) {
+            node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
+        datePickerBirthday.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) ->{
+            if (event.getCode()==KeyCode.ESCAPE){
+                event.consume();
+                        esc.fire();
+            }
+        });
+    }
     public void resetField() {
         textFieldName.setText("");
         textFieldNumber.setText("");
         datePickerBirthday.setValue(null);
         textFieldName.requestFocus();
     }
-
     public void getCustomerInField(Customer customer) {
         customer.setCustomerName(textFieldName.getText());
         customer.setNumber(textFieldNumber.getText());
@@ -83,7 +131,7 @@ public class FXMLCustomerController implements Initializable {
         return false;
     }
 
-    public void addCustomer(ActionEvent event) {
+    public void addCustomer() {
         Customer customer = new Customer();
         if (checkValid()) {
             getCustomerInField(customer);

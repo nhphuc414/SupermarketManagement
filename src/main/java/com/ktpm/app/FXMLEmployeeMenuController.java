@@ -23,12 +23,10 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +35,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -47,6 +46,10 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.KeyCode;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.ESCAPE;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -60,19 +63,25 @@ import org.controlsfx.control.SearchableComboBox;
 public class FXMLEmployeeMenuController implements Initializable {
 
     @FXML
+    private Label labelName;
+    
+    @FXML
     private Button btnAdd;
 
     @FXML
     private Button btnAddCustomer;
 
     @FXML
-    private Label labelFind;
-
-    @FXML
     private Button btnCheckCustomer;
 
     @FXML
     private Button btnPay;
+
+    @FXML
+    private Button btnReturn;
+
+    @FXML
+    private Label labelFind;
 
     @FXML
     private SearchableComboBox<Product> comboBoxProduct;
@@ -112,17 +121,57 @@ public class FXMLEmployeeMenuController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         onLoad();
     }
-
-    public void handleSignOut(ActionEvent event) {
-        Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.isPresent() && result.get() == ButtonType.OK) {
-            try {
-                App.setCurrentEmployee(null);
-                App.setRoot("FXMLLogin", "Login");
-            } catch (IOException io) {
-                Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
+    public void onLoad() {
+        labelName.setText(App.getCurrentEmployee().getEmployeeName());
+        loadProducts();
+        loadColumns();
+        labelTotal.setText("0");
+        addEnterEvent(btnAdd, btnReturn);
+        textFieldNumber.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) ->{
+            if (event.getCode() == KeyCode.ENTER){
+                event.consume();
+                btnCheckCustomer.fire();
             }
+        });
+    }
+    
+    private EventHandler<KeyEvent> addEnterEvent(Button add, Button esc) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldQuantity);
+        EventHandler<KeyEvent> eventHandler = event -> {
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case ENTER:
+                        event.consume();
+                        add.fire();
+                        break;
+                    case ESCAPE:
+                        event.consume();
+                        esc.fire();
+                        break;
+                    case F1:
+                        event.consume();
+                        btnPay.fire();
+                        break;
+                    case F2:
+                        event.consume();
+                        btnAddCustomer.fire();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        for (Node node : nodeList) {
+                node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
+        return eventHandler;
+    }
+    private void removeEnterEvent(EventHandler<KeyEvent> eventHandler) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldQuantity);
+        for (Node node : nodeList) {
+            node.removeEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
         }
     }
 
@@ -190,12 +239,6 @@ public class FXMLEmployeeMenuController implements Initializable {
         }
     }
 
-    public void onLoad() {
-
-        loadProducts();
-        loadColumns();
-    }
-
     public void onChoose() {
         Product product = comboBoxProduct.getValue();
         if (product == null) {
@@ -208,7 +251,8 @@ public class FXMLEmployeeMenuController implements Initializable {
 
     public void resetField() {
         comboBoxProduct.setValue(null);
-        textFieldQuantity.requestFocus();
+        textFieldNumber.setText("");
+        comboBoxProduct.requestFocus();
     }
 
     public void resetAll() {
@@ -220,9 +264,9 @@ public class FXMLEmployeeMenuController implements Initializable {
         labelTotalBirthday.setText("");
         orderDetailTableData.removeAll(orderDetailTableData);
         pricePay = 0;
-        textFieldQuantity.requestFocus();
+        comboBoxProduct.requestFocus();
     }
-
+    
     public void loadOnField(OrderDetail orderDetail) {
         for (Product product : productTableData) {
             if (product.getId() == orderDetail.getProductId()) {
@@ -295,6 +339,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             } else {
                 labelFind.setText("Khách hàng là thành viên của hệ thống");
                 customer = findcustomer;
+                comboBoxProduct.requestFocus();
                 priceFinalColumn.setCellValueFactory(cellData -> {
                     int productId = cellData.getValue().getProductId();
                     String price = "";
@@ -354,6 +399,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             Scene scene = new Scene(fxmlLoader.load());
             stage.setScene(scene);
             stage.show();
+            comboBoxProduct.requestFocus();
         } catch (IOException ex) {
             Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
         }
@@ -394,6 +440,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             }
 
         }
+        comboBoxProduct.requestFocus();
     }
 
     public void payOrder() {
@@ -442,7 +489,7 @@ public class FXMLEmployeeMenuController implements Initializable {
         private final Button deleteButton = new Button("Xóa");
         EventHandler<ActionEvent> originalEditEvent;
         EventHandler<ActionEvent> originalDeleteEvent;
-
+        private EventHandler<KeyEvent> eventEnter;
         private void setButton(Boolean value) {
             tableOrderDetail.lookupAll("Button").forEach(node -> {
                 if (node instanceof Button) {
@@ -459,17 +506,22 @@ public class FXMLEmployeeMenuController implements Initializable {
             deleteButton.setText("Hủy bỏ");
             btnAdd.setDisable(true);
             btnPay.setDisable(true);
+            btnReturn.setDisable(true);
             btnCheckCustomer.setDisable(true);
             textFieldNumber.setDisable(true);
             btnAddCustomer.setDisable(true);
+            eventEnter=addEnterEvent(this.editButton, this.deleteButton);
             setButton(true);
+            comboBoxProduct.requestFocus();
         }
 
         private void afterCommitOrCancel() {
             resetField();
             setButton(false);
+            removeEnterEvent(eventEnter);
             btnAdd.setDisable(false);
             btnPay.setDisable(false);
+            btnReturn.setDisable(false);
             btnAddCustomer.setDisable(false);
             btnCheckCustomer.setDisable(false);
             textFieldNumber.setDisable(false);
@@ -494,6 +546,18 @@ public class FXMLEmployeeMenuController implements Initializable {
                         getOrderDetailInField(orderDetail);
                         for (OrderDetail orderDetailInTable : orderDetailTableData) {
                             if (orderDetailInTable.getProductId() == orderDetail.getProductId() && !orderDetailInTable.getId().equals(orderDetail.getId())) {
+                                double totalQuantity = orderDetailInTable.getQuantity() + orderDetail.getQuantity();
+                                double quantityInStock;
+                                try {
+                                    quantityInStock = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), orderDetailInTable.getProductId()).getQuantity();
+                                } catch (SQLException ex) {
+                                    Utils.getBox("Lỗi", "", "Lỗi kết nối đến Database", Alert.AlertType.ERROR).showAndWait();  
+                                    break;
+                                }
+                                if (totalQuantity > quantityInStock) {
+                                    Utils.getBox("Lỗi", "", "Số lượng lớn hơn trong kho", Alert.AlertType.ERROR).showAndWait();
+                                    break;
+                                }
                                 orderDetailInTable.setQuantity(orderDetailInTable.getQuantity() + orderDetail.getQuantity());
                                 orderDetailTableData.remove(orderDetail);
                                 break;
@@ -520,12 +584,23 @@ public class FXMLEmployeeMenuController implements Initializable {
         @Override
         protected void updateItem(Void item, boolean empty) {
             super.updateItem(item, empty);
-
             if (empty) {
                 setGraphic(null);
             } else {
                 HBox buttonBox = new HBox(editButton, deleteButton);
                 setGraphic(buttonBox);
+            }
+        }
+    }
+    public void handleSignOut(ActionEvent event) {
+        Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try {
+                App.setCurrentEmployee(null);
+                App.setRoot("FXMLLogin", "Login");
+            } catch (IOException io) {
+                Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
             }
         }
     }

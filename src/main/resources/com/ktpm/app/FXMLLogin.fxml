@@ -9,11 +9,11 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane fx:id="stackPaneId" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="720.0" stylesheets="@../../../styles/fxmllogin.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLLoginController">
+<StackPane fx:id="stackPaneId" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0" prefWidth="720.0" stylesheets="@../../../styles/fxmlstyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ktpm.app.FXMLLoginController">
    <children>
       <AnchorPane prefHeight="200.0" prefWidth="200.0">
          <children>
-            <AnchorPane layoutY="6.0" prefHeight="480.0" prefWidth="360.0" styleClass="left-form" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="360.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane layoutY="6.0" prefHeight="480.0" prefWidth="360.0" styleClass="left-login-anchor" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="360.0" AnchorPane.topAnchor="0.0">
                <children>
                   <FontAwesomeIconView glyphName="SHOPPING_CART" layoutX="85.0" layoutY="213.0" size="15em" />
                   <Label layoutX="17.0" layoutY="261.0" text="Supermarket Management System">
@@ -23,7 +23,7 @@
                   </Label>
                </children>
             </AnchorPane>
-            <AnchorPane layoutX="360.0" prefHeight="482.0" prefWidth="360.0" styleClass="right-form" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <AnchorPane layoutX="360.0" prefHeight="482.0" prefWidth="360.0" styleClass="right-login-anchor" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                <children>
                   <FontAwesomeIconView glyphName="USER" layoutX="129.0" layoutY="137.0" size="12em" />
                   <Label layoutX="139.0" layoutY="158.0" text="Sign In">
@@ -33,7 +33,7 @@
                   </Label>
                   <TextField fx:id="txtUsername" layoutX="80.0" layoutY="223.0" prefHeight="35.0" prefWidth="200.0" promptText="Username" styleClass="text-field" />
                   <PasswordField fx:id="txtPassword" layoutX="81.0" layoutY="279.0" prefHeight="35.0" prefWidth="200.0" promptText="Password" styleClass="text-field" />
-                  <Button layoutX="139.0" layoutY="340.0" mnemonicParsing="false" onAction="#loginAccount" prefHeight="35.0" prefWidth="83.0" styleClass="login-button" text="Login" />
+                  <Button fx:id="btnLogin" layoutX="139.0" layoutY="340.0" mnemonicParsing="false" onAction="#loginAccount" prefHeight="35.0" prefWidth="83.0" styleClass="login-button" text="Login" />
                </children>
             </AnchorPane>
          </children>

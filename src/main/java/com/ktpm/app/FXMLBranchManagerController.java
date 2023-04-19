@@ -11,6 +11,7 @@ import com.ktpm.utils.Utils;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -20,15 +21,20 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.ESCAPE;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 
 /**
@@ -39,7 +45,13 @@ import javafx.scene.layout.HBox;
 public class FXMLBranchManagerController implements Initializable {
 
     @FXML
+    private Label labelName;
+    
+    @FXML
     private Button btnAdd;
+    @FXML
+    private Button btnReturn;
+
     @FXML
     private TableView<Branch> tableBranch;
     @FXML
@@ -48,13 +60,58 @@ public class FXMLBranchManagerController implements Initializable {
     private TextField textFieldAddress;
 
     private final BranchService branchService = new BranchServiceImpl();
-    private final  ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
+    private final ObservableList<Branch> branchTableData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         onLoad();
     }
-
+    public void onLoad() {
+        addEnterEvent(btnAdd,btnReturn);
+        loadColumns();
+        labelName.setText(App.getCurrentEmployee().getEmployeeName());
+        try {
+            List<Branch> branches = branchService.getAllBranches();
+            branchTableData.addAll(branches);
+            tableBranch.setItems(branchTableData);
+        } catch (SQLException ex) {
+            Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
+        }
+    }
+    private EventHandler<KeyEvent> addEnterEvent(Button add, Button esc) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldName);
+        nodeList.add(textFieldAddress);
+        EventHandler<KeyEvent> eventHandler = event -> {
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case ENTER:
+                        event.consume();
+                        add.fire();
+                        break;
+                    case ESCAPE:
+                        event.consume();
+                        esc.fire();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        for (Node node : nodeList) {
+            node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
+        return eventHandler;
+    }
+    private void removeEnterEvent(EventHandler<KeyEvent> eventHandler){
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(textFieldName);
+        nodeList.add(textFieldAddress);
+        for (Node node : nodeList) {
+            node.removeEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }  
+    }
+    
     public void returnMain(ActionEvent event) {
         try {
             App.setRoot("FXMLAdminMenu", "Supermarket Manager");
@@ -81,16 +138,7 @@ public class FXMLBranchManagerController implements Initializable {
         tableBranch.getColumns().add(actionColumn);
     }
 
-    public void onLoad() {
-        loadColumns();
-        try {
-            List<Branch> branches = branchService.getAllBranches();
-            branchTableData.addAll(branches);
-            tableBranch.setItems(branchTableData);
-        } catch (SQLException ex) {
-            Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
-        }
-    }
+    
 
     public void resetField() {
         textFieldName.setText("");
@@ -113,19 +161,21 @@ public class FXMLBranchManagerController implements Initializable {
         String name = textFieldName.getText().trim();
         String address = textFieldAddress.getText().trim();
         if (Utils.checkTextField(name, "Tên chi nhánh", 30, 0)
-            && Utils.checkTextField(address, "Tên chi nhánh", 50, 4)) {
+                && Utils.checkTextField(address, "Tên chi nhánh", 50, 4)) {
             if (branchTableData.stream().
                     anyMatch(b -> !b.getId().equals(id)
-                    && (   b.getBranchName().equalsIgnoreCase(name) 
-                        || b.getAddress().equalsIgnoreCase(address)))) {
+                    && (b.getBranchName().equalsIgnoreCase(name)
+                    || b.getAddress().equalsIgnoreCase(address)))) {
                 Utils.getBox("Lỗi", "", "Trùng tên địa chỉ hoặc chi nhánh", AlertType.ERROR).showAndWait();
                 textFieldName.requestFocus();
                 return false;
-            } else return true;
+            } else {
+                return true;
+            }
         }
         textFieldName.requestFocus();
         return false;
-        
+
     }
 
     public void addBranch(ActionEvent event) {
@@ -151,6 +201,7 @@ public class FXMLBranchManagerController implements Initializable {
         private final Button deleteButton = new Button("Xóa");
         private EventHandler<ActionEvent> originalEditEvent;
         private EventHandler<ActionEvent> originalDeleteEvent;
+        private EventHandler<KeyEvent> eventEnter;
 
         private void setButton(Boolean value) {
             tableBranch.lookupAll("Button").forEach(node -> {
@@ -167,19 +218,22 @@ public class FXMLBranchManagerController implements Initializable {
             editButton.setText("Cập nhật");
             deleteButton.setText("Hủy bỏ");
             btnAdd.setDisable(true);
+            btnReturn.setDisable(true);
+            eventEnter=addEnterEvent(this.editButton, this.deleteButton);
             setButton(true);
         }
 
         private void afterCommitOrCancel() {
             resetField();
             setButton(false);
+            removeEnterEvent(eventEnter);
             btnAdd.setDisable(false);
+            btnReturn.setDisable(false);
             editButton.setText("Sửa");
             deleteButton.setText("Xóa");
             editButton.setOnAction(originalEditEvent);
             deleteButton.setOnAction(originalDeleteEvent);
         }
-
         public ButtonCell() {
             editButton.setOnAction(event -> {
                 beforeCommit();
@@ -187,7 +241,7 @@ public class FXMLBranchManagerController implements Initializable {
                 originalDeleteEvent = deleteButton.getOnAction();
                 Branch branch = getTableView().getItems().get(getIndex());
                 loadOnField(branch);
-                
+
                 deleteButton.setOnAction(cancelEvent -> {
                     afterCommitOrCancel();
                 });

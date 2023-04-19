@@ -16,6 +16,7 @@ import java.net.URL;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -25,17 +26,23 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import static javafx.scene.input.KeyCode.DELETE;
+import static javafx.scene.input.KeyCode.ENTER;
+import static javafx.scene.input.KeyCode.ESCAPE;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import org.controlsfx.control.SearchableComboBox;
 
@@ -47,7 +54,16 @@ import org.controlsfx.control.SearchableComboBox;
 public class FXMLEmployeeManagerController implements Initializable {
 
     @FXML
+    private Label labelName;
+    
+    @FXML
     private Button btnAdd;
+
+    @FXML
+    private Button btnDelete;
+
+    @FXML
+    private Button btnReturn;
 
     @FXML
     private SearchableComboBox<Branch> comboBoxBranch;
@@ -92,11 +108,55 @@ public class FXMLEmployeeManagerController implements Initializable {
         onLoad();
     }
 
-    public void returnMain(ActionEvent event) {
-        try {
-            App.setRoot("FXMLAdminMenu", " Manager");
-        } catch (IOException io) {
-            Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
+    private EventHandler<KeyEvent> addEnterEvent(Button add, Button esc) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(comboBoxBranch);
+        nodeList.add(comboboxRole);
+        nodeList.add(datePickerBirthday);
+        nodeList.add(textFieldConfirm);
+        nodeList.add(textFieldNumber);
+        nodeList.add(textFieldPassword);
+        nodeList.add(textFieldUsername);
+        nodeList.add(textFieldName);
+        nodeList.add(tableEmployee);
+        EventHandler<KeyEvent> eventHandler = event -> {
+            if (null != event.getCode()) {
+                switch (event.getCode()) {
+                    case ENTER:
+                        event.consume();
+                        add.fire();
+                        break;
+                    case ESCAPE:
+                        event.consume();
+                        esc.fire();
+                        break;
+                    case DELETE:
+                        event.consume();
+                        btnDelete.fire();
+                        break;
+                    default:
+                        break;
+                }
+            }
+        };
+        for (Node node : nodeList) {
+                node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+        }
+        return eventHandler;
+    }
+    private void removeEnterEvent(EventHandler<KeyEvent> eventHandler) {
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(comboBoxBranch);
+        nodeList.add(comboboxRole);
+        nodeList.add(datePickerBirthday);
+        nodeList.add(textFieldConfirm);
+        nodeList.add(textFieldNumber);
+        nodeList.add(textFieldPassword);
+        nodeList.add(textFieldUsername);
+        nodeList.add(textFieldName);
+        nodeList.add(tableEmployee);
+        for (Node node : nodeList) {
+            node.removeEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
         }
     }
 
@@ -134,6 +194,8 @@ public class FXMLEmployeeManagerController implements Initializable {
 
     public void onLoad() {
         loadColumns();
+        labelName.setText(App.getCurrentEmployee().getEmployeeName());
+        addEnterEvent(btnAdd, btnReturn);
         //Load role
         comboboxRole.getItems().addAll(Employee.EmployeeRole.Employee, Employee.EmployeeRole.Manager);
         comboboxRole.setValue(Employee.EmployeeRole.Employee);
@@ -146,8 +208,6 @@ public class FXMLEmployeeManagerController implements Initializable {
             employeeTableData.addAll(employees);
 
             comboBoxBranch.setItems(branchTableData);
-            comboBoxBranch.setValue(branchTableData.get(0));
-
             tableEmployee.setItems(employeeTableData);
         } catch (SQLException ex) {
             Utils.getBox("Lỗi kết nối cơ sở dữ liệu", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -155,14 +215,14 @@ public class FXMLEmployeeManagerController implements Initializable {
     }
 
     public void resetField() {
-        comboBoxBranch.setValue(branchTableData.get(0));
+        comboBoxBranch.setValue(null);
         textFieldName.setText("");
         textFieldNumber.setText("");
         textFieldUsername.setText("");
         textFieldPassword.setText("");
         textFieldConfirm.setText("");
         datePickerBirthday.setValue(null);
-        textFieldName.requestFocus();
+        comboBoxBranch.requestFocus();
         btnAdd.setDisable(false);
     }
 
@@ -248,6 +308,7 @@ public class FXMLEmployeeManagerController implements Initializable {
         }
         return false;
     }
+
     public void addEmployee(ActionEvent event) {
         Employee employee = new Employee();
         if (checkValid("")) {
@@ -272,6 +333,7 @@ public class FXMLEmployeeManagerController implements Initializable {
         private final Button deleteButton = new Button("Xóa");
         private EventHandler<ActionEvent> originalEditEvent;
         private EventHandler<ActionEvent> originalDeleteEvent;
+        private EventHandler<KeyEvent> eventEnter;
 
         private void setButton(Boolean value) {
             tableEmployee.lookupAll("Button").forEach(node -> {
@@ -288,20 +350,24 @@ public class FXMLEmployeeManagerController implements Initializable {
             editButton.setText("Cập nhật");
             deleteButton.setText("Hủy bỏ");
             btnAdd.setDisable(true);
+            btnReturn.setDisable(true);
+            eventEnter = addEnterEvent(this.editButton, this.deleteButton);
             setButton(true);
+            comboBoxBranch.requestFocus();
         }
 
         private void afterCommitOrCancel() {
             resetField();
             setButton(false);
+            removeEnterEvent(eventEnter);
             btnAdd.setDisable(false);
+            btnReturn.setDisable(false);
             editButton.setText("Sửa");
             deleteButton.setText("Xóa");
             editButton.setOnAction(originalEditEvent);
             deleteButton.setOnAction(originalDeleteEvent);
             textFieldUsername.setEditable(true);
         }
-
         public ButtonCell() {
             editButton.setOnAction(event -> {
                 beforeCommit();
@@ -357,6 +423,14 @@ public class FXMLEmployeeManagerController implements Initializable {
                 HBox buttonBox = new HBox(editButton, deleteButton);
                 setGraphic(buttonBox);
             }
+        }
+    }
+
+    public void returnMain(ActionEvent event) {
+        try {
+            App.setRoot("FXMLAdminMenu", " Manager");
+        } catch (IOException io) {
+            Utils.getBox("Thất bại", "", "Không thể chuyển trang", Alert.AlertType.ERROR).showAndWait();
         }
     }
 }
