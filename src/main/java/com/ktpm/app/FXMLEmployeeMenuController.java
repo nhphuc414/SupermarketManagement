@@ -64,7 +64,7 @@ public class FXMLEmployeeMenuController implements Initializable {
 
     @FXML
     private Label labelName;
-    
+
     @FXML
     private Button btnAdd;
 
@@ -121,20 +121,21 @@ public class FXMLEmployeeMenuController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         onLoad();
     }
+
     public void onLoad() {
         labelName.setText(App.getCurrentEmployee().getEmployeeName());
         loadProducts();
         loadColumns();
         labelTotal.setText("0");
         addEnterEvent(btnAdd, btnReturn);
-        textFieldNumber.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) ->{
-            if (event.getCode() == KeyCode.ENTER){
+        textFieldNumber.addEventFilter(KeyEvent.KEY_PRESSED, (KeyEvent event) -> {
+            if (event.getCode() == KeyCode.ENTER) {
                 event.consume();
                 btnCheckCustomer.fire();
             }
         });
     }
-    
+
     private EventHandler<KeyEvent> addEnterEvent(Button add, Button esc) {
         List<Node> nodeList = new ArrayList<>();
         nodeList.add(textFieldQuantity);
@@ -163,10 +164,11 @@ public class FXMLEmployeeMenuController implements Initializable {
             }
         };
         for (Node node : nodeList) {
-                node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
+            node.addEventFilter(KeyEvent.KEY_PRESSED, eventHandler);
         }
         return eventHandler;
     }
+
     private void removeEnterEvent(EventHandler<KeyEvent> eventHandler) {
         List<Node> nodeList = new ArrayList<>();
         nodeList.add(textFieldQuantity);
@@ -257,16 +259,16 @@ public class FXMLEmployeeMenuController implements Initializable {
 
     public void resetAll() {
         productTableData.removeAll(productTableData);
-        loadProducts();
+        orderDetailTableData.removeAll(orderDetailTableData);
         textFieldNumber.setText("");
         labelFind.setText("");
         labelTotal.setText("0");
+        textFieldQuantity.setText("");
         labelTotalBirthday.setText("");
-        orderDetailTableData.removeAll(orderDetailTableData);
         pricePay = 0;
         comboBoxProduct.requestFocus();
     }
-    
+
     public void loadOnField(OrderDetail orderDetail) {
         for (Product product : productTableData) {
             if (product.getId() == orderDetail.getProductId()) {
@@ -289,7 +291,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             List<Discount> discounts = discountService.getDiscountsByProductId(productId);
             for (Discount discount : discounts) {
                 if (discount.getStartDate().before(Date.valueOf(LocalDate.now())) && discount.getEndDate().after(Date.valueOf(LocalDate.now()))) {
-                    return price - price * discount.getDiscountPercent() / 100;
+                    return price * (100-discount.getDiscountPercent());
                 }
             }
         } catch (SQLException ex) {
@@ -367,7 +369,7 @@ public class FXMLEmployeeMenuController implements Initializable {
                 && customer.getBirthday().toLocalDate().getDayOfMonth() == LocalDate.now().getDayOfMonth()
                 && sum >= 1000000) {
             labelTotal.setText(Utils.df.format(sum) + "     --->");
-            sum = sum - sum * 0.1;
+            sum = sum * 0.9;
             pricePay = sum;
             labelTotalBirthday.setText(Utils.df.format(sum) + "(-10%)");
         } else {
@@ -454,7 +456,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             resetOrderDetail = false;
             Stage stage = new Stage();
             stage.initModality(Modality.APPLICATION_MODAL);
-            stage.setTitle("Thêm khách hàng");
+            stage.setTitle("Xuất hóa đơn");
             stage.setResizable(false);
             stage.sizeToScene();
             stage.centerOnScreen();
@@ -470,9 +472,13 @@ public class FXMLEmployeeMenuController implements Initializable {
                 Scene scene = new Scene(fxmlLoader.load());
                 stage.setScene(scene);
                 stage.showAndWait();
-                if (resetOrderDetail && !stage.isShowing()) {
-                    loadProducts();
+                if (resetOrderDetail) {
+                    customer = null;
+                    tableOrderDetail.getColumns().removeAll(tableOrderDetail.getColumns());
+                    comboBoxProduct.getItems().removeAll(productTableData);
                     resetAll();
+                    loadColumns();
+                    loadProducts();
                 }
             } catch (IOException ex) {
                 Utils.getBox("Thất bại", "", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
@@ -490,6 +496,7 @@ public class FXMLEmployeeMenuController implements Initializable {
         EventHandler<ActionEvent> originalEditEvent;
         EventHandler<ActionEvent> originalDeleteEvent;
         private EventHandler<KeyEvent> eventEnter;
+
         private void setButton(Boolean value) {
             tableOrderDetail.lookupAll("Button").forEach(node -> {
                 if (node instanceof Button) {
@@ -510,7 +517,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             btnCheckCustomer.setDisable(true);
             textFieldNumber.setDisable(true);
             btnAddCustomer.setDisable(true);
-            eventEnter=addEnterEvent(this.editButton, this.deleteButton);
+            eventEnter = addEnterEvent(this.editButton, this.deleteButton);
             setButton(true);
             comboBoxProduct.requestFocus();
         }
@@ -551,7 +558,7 @@ public class FXMLEmployeeMenuController implements Initializable {
                                 try {
                                     quantityInStock = branchProductService.getBranchProductsByBranchIdAndProductId(App.getCurrentEmployee().getBranchId(), orderDetailInTable.getProductId()).getQuantity();
                                 } catch (SQLException ex) {
-                                    Utils.getBox("Lỗi", "", "Lỗi kết nối đến Database", Alert.AlertType.ERROR).showAndWait();  
+                                    Utils.getBox("Lỗi", "", "Lỗi kết nối đến Database", Alert.AlertType.ERROR).showAndWait();
                                     break;
                                 }
                                 if (totalQuantity > quantityInStock) {
@@ -592,6 +599,7 @@ public class FXMLEmployeeMenuController implements Initializable {
             }
         }
     }
+
     public void handleSignOut(ActionEvent event) {
         Alert alert = Utils.getBox("Confirm Sign Out", null, "Are you sure you want to sign out?", Alert.AlertType.CONFIRMATION);
         Optional<ButtonType> result = alert.showAndWait();

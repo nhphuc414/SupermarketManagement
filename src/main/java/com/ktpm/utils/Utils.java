@@ -20,7 +20,9 @@ import javafx.scene.control.ButtonType;
  * @author ad
  */
 public class Utils {
+
     public static DecimalFormat df = new DecimalFormat("#.###");
+
     public static String normalizeName(String inputName) {
         String[] nameParts = inputName.split(" ");
         StringBuilder normalizedBuilder = new StringBuilder();
@@ -68,25 +70,25 @@ public class Utils {
     public static boolean checkEmpty(Object object) {
         if (object == null) {
             Utils.getBox("Lỗi", "", "Không được để trống thông tin", Alert.AlertType.ERROR).showAndWait();
-            return false;
         } else if (object.equals("")) {
             Utils.getBox("Lỗi", "", "Không được để trống thông tin", Alert.AlertType.ERROR).showAndWait();
-            return false;
-        } else if (String.valueOf(object).length()>50){
+        } else if (String.valueOf(object).length() > 50) {
             Utils.getBox("Lỗi", "", "Trường nhập vào quá lớn", Alert.AlertType.ERROR).showAndWait();
-            return false;
+        } else {
+            return true;
         }
-        return true;
-
+        return false;
     }
 
     public static boolean checkName(String name) {
         if (checkEmpty(name)) {
-            if (checkTextField(name, "Tên", 30, 4) && !name.matches("[\\p{L}\\s]+")) {
-                Utils.getBox("Lỗi", "Tên không được chứa số hoặc ký tự đặc biệt", "", Alert.AlertType.ERROR).showAndWait();
-                return false;
+            if (checkTextField(name, "Tên", 30, 4)) {
+                if (!name.matches("[\\p{L}\\s]+")) {
+                    Utils.getBox("Lỗi", "Tên không được chứa số hoặc ký tự đặc biệt", "", Alert.AlertType.ERROR).showAndWait();
+                } else {
+                    return true;
+                }
             }
-            return true;
         }
         return false;
     }
@@ -95,12 +97,13 @@ public class Utils {
         if (checkEmpty(field)) {
             if (field.length() > max) {
                 Utils.getBox("Lỗi", "Lỗi nhập liệu", "Vui lòng nhập " + error + " ít hơn " + max + " ký tự", Alert.AlertType.ERROR).showAndWait();
-                return false;
+
             } else if (field.length() < min) {
                 Utils.getBox("Lỗi", "Lỗi nhập liệu", error + " quá ngắn", Alert.AlertType.ERROR).showAndWait();
-                return false;
+
+            } else {
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -109,9 +112,9 @@ public class Utils {
         if (checkEmpty(number)) {
             if (!number.matches("^0\\d{9}$")) {
                 Utils.getBox("Lỗi", "Lỗi nhập liệu", "SDT phải bắt đầu từ 0 và phải có 10 số", Alert.AlertType.ERROR).showAndWait();
-                return false;
+            } else {
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -120,9 +123,9 @@ public class Utils {
         if (checkEmpty(birthday)) {
             if (!Date.valueOf(birthday).before(Date.valueOf(LocalDate.now()))) {
                 Utils.getBox("Lỗi", "Ngày sinh không đúng", "Vui lòng chọn ngày sinh trước ngày hiện tại", Alert.AlertType.ERROR).showAndWait();
-                return false;
+            } else {
+                return true;
             }
-            return true;
         }
         return false;
     }
@@ -131,25 +134,21 @@ public class Utils {
         if (checkEmpty(product) && checkEmpty(textQuantity)) {
             if (product.getProductType() == Product.ProductType.Quantity && !textQuantity.matches("\\d*")) {
                 Utils.getBox("Lỗi", "Sai số lượng", "Vui lòng nhập số lượng chính xác", Alert.AlertType.ERROR).showAndWait();
-                return false;
             } else try {
                 Double quantity = Double.valueOf(textQuantity);
                 if (textQuantity.length() > 20) {
                     Utils.getBox("Lỗi", "Quá lớn", "Số lượng quá lớn", Alert.AlertType.ERROR).showAndWait();
-                    return false;
-                }
-                if ((product.getProductType() == Product.ProductType.Quantity && quantity < 1)
+                } else if ((product.getProductType() == Product.ProductType.Quantity && quantity < 1)
                         || (product.getProductType() == Product.ProductType.Weight && quantity <= 0)) {
                     Utils.getBox("Lỗi", "", "Vui lòng nhập số lượng chính xác", Alert.AlertType.ERROR).showAndWait();
-                    return false;
+                } else {
+                    return true;
                 }
             } catch (NumberFormatException e) {
                 Utils.getBox("Lỗi", "Sai số lượng", "Vui lòng nhập đúng số lượng", Alert.AlertType.ERROR).showAndWait();
-                return false;
             }
-            return true;
         }
         return false;
     }
-    
+
 }

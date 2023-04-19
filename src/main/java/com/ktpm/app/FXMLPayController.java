@@ -149,7 +149,7 @@ public class FXMLPayController implements Initializable {
                 Stage stage = (Stage) labelpriceChange.getScene().getWindow();
                 stage.close();
             } catch (SQLException ex) {
-                Utils.getBox("Thất bại", "Có lỗi", "Thêm Hóa đơn thất bại", Alert.AlertType.ERROR).showAndWait();
+                Utils.getBox("Thất bại", "Thêm Hóa đơn thất bại", ex.getMessage(), Alert.AlertType.ERROR).showAndWait();
             }
         }
 
