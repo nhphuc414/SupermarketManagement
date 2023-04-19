@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="600.0" styleClass="left-anchor" stylesheets="@../../../styles/fxmlstyle.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Label layoutX="87.0" layoutY="94.0" text="Tổng cộng:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="labelpricePay" layoutX="202.0" layoutY="91.0" prefHeight="37.0" prefWidth="351.0" styleClass="label-pay">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label layoutX="14.0" layoutY="177.0" text="Tiền nhận từ khách:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <TextField fx:id="textFieldPriceFromCustomer" layoutX="202.0" layoutY="169.0" onInputMethodTextChanged="#checkChange" onKeyPressed="#checkChange" onKeyTyped="#checkChange" prefHeight="37.0" prefWidth="351.0">
+         <font>
+            <Font size="20.0" />
+         </font></TextField>
+      <Label layoutX="96.0" layoutY="255.0" text="Tiền thối:">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Label fx:id="labelpriceChange" layoutX="202.0" layoutY="252.0" prefHeight="37.0" prefWidth="351.0" styleClass="label-pay">
+         <font>
+            <Font size="20.0" />
+         </font>
+      </Label>
+      <Button fx:id="btnAdd" layoutX="453.0" layoutY="332.0" mnemonicParsing="false" onAction="#addOrder" prefHeight="37.0" prefWidth="100.0" styleClass="button-other" text="Xuất hóa đơn" />
+      <Button fx:id="btnDelete" layoutX="328.0" layoutY="332.0" mnemonicParsing="false" onAction="#deleteOrder" prefHeight="37.0" prefWidth="100.0" styleClass="button-other" text="Hủy hóa đơn" />
+      <Button fx:id="btnReturn" layoutX="61.0" layoutY="351.0" mnemonicParsing="false" onAction="#returnMain" prefHeight="37.0" prefWidth="82.0" styleClass="button-return" text="Trở về" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" />
+   </children>
+</AnchorPane>

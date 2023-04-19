@@ -23,31 +23,31 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void addOrder(Order order) throws SQLException {
-        String sql = "INSERT INTO orders (id, order_date, cash_received, employee_id, customer_id) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO orders (id, order_date, total,cash_received, employee_id, customer_id) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setString(1, order.getId());
             pstmt.setDate(2, order.getOrderDate());
-            pstmt.setDouble(3, order.getCashReceived());
-            pstmt.setString(4, order.getEmployeeId());
-            pstmt.setString(5, order.getCustomerId());
+            pstmt.setDouble(3, order.getTotal());
+            pstmt.setDouble(4, order.getCashReceived());
+            pstmt.setString(5, order.getEmployeeId());
+            pstmt.setString(6, order.getCustomerId());
             pstmt.executeUpdate();
-
         }
     }
 
     @Override
     public void updateOrder(Order order) throws SQLException {
-        String sql = "UPDATE orders SET order_date = ?, cash_received = ?, employee_id = ?, customer_id = ? WHERE id = ?";
+        String sql = "UPDATE orders SET order_date = ?, total = ?, cash_received = ?, employee_id = ?, customer_id = ? WHERE id = ?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setDate(1, order.getOrderDate());
-            pstmt.setDouble(2, order.getCashReceived());
-            pstmt.setString(3, order.getEmployeeId());
-            pstmt.setString(4, order.getCustomerId());
-            pstmt.setString(5, order.getId());
+            pstmt.setDouble(2, order.getTotal());
+            pstmt.setDouble(3, order.getCashReceived());
+            pstmt.setString(4, order.getEmployeeId());
+            pstmt.setString(5, order.getCustomerId());
+            pstmt.setString(6, order.getId());
             pstmt.executeUpdate();
-
         }
     }
 
@@ -72,6 +72,7 @@ public class OrderServiceImpl implements OrderService {
             if (rs.next()) {
                 order = new Order(rs.getString("id"),
                         rs.getDate("order_date"),
+                        rs.getDouble("total"),
                         rs.getDouble("cash_received"),
                         rs.getString("employee_id"),
                         rs.getString("customer_id"));
@@ -91,6 +92,7 @@ public class OrderServiceImpl implements OrderService {
             while (rs.next()) {
                 Order order = new Order(rs.getString("id"),
                         rs.getDate("order_date"),
+                        rs.getDouble("total"),
                         rs.getDouble("cash_received"),
                         rs.getString("employee_id"),
                         rs.getString("customer_id"));
@@ -111,6 +113,7 @@ public class OrderServiceImpl implements OrderService {
             while (rs.next()) {
                 Order order = new Order(rs.getString("id"),
                         rs.getDate("order_date"),
+                        rs.getDouble("total"),
                         rs.getDouble("cash_received"),
                         rs.getString("employee_id"),
                         rs.getString("customer_id"));
@@ -132,6 +135,7 @@ public class OrderServiceImpl implements OrderService {
             while (rs.next()) {
                 Order order = new Order(rs.getString("id"),
                         rs.getDate("order_date"),
+                        rs.getDouble("total"),
                         rs.getDouble("cash_received"),
                         rs.getString("employee_id"),
                         rs.getString("customer_id"));
@@ -151,6 +155,7 @@ public class OrderServiceImpl implements OrderService {
             while (rs.next()) {
                 Order order = new Order(rs.getString("id"),
                         rs.getDate("order_date"),
+                        rs.getDouble("total"),
                         rs.getDouble("cash_received"),
                         rs.getString("employee_id"),
                         rs.getString("customer_id"));
