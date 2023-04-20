@@ -72,7 +72,7 @@ public class BranchProductServiceTest {
         branchProduct.setId("add");
         branchProduct.setQuantity(40);
         branchProduct.setProductId(product.getId());
-        branchProduct.setBranchId("test");
+        branchProduct.setBranchId(branch.getId());
         branchProductService.addBranchProduct(branchProduct);
     }
 
@@ -112,7 +112,6 @@ public class BranchProductServiceTest {
         BranchProduct retrievedBranchproduct = branchProductService.getBranchProductById(branchProduct.getId());
         assertNull(retrievedBranchproduct);
     }
-
     @Test
     public void testGetBranchProductById() throws Exception {
         // Verify that the branch was added correctly by retrieving it from the database

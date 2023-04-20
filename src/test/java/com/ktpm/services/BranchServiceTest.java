@@ -1,7 +1,11 @@
 package com.ktpm.services;
 
 import com.ktpm.pojo.Branch;
+import com.ktpm.pojo.BranchProduct;
+import com.ktpm.pojo.Product;
+import com.ktpm.services.impl.BranchProductServiceImpl;
 import com.ktpm.services.impl.BranchServiceImpl;
+import com.ktpm.services.impl.ProductServiceImpl;
 import com.ktpm.utils.JDBCUtils;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -87,7 +91,32 @@ public class BranchServiceTest {
         Branch retrievedBranch = branchService.getBranchById(branch.getId());
         assertNull(retrievedBranch);
     }
-
+    @Test
+    public void testDeleteBranchFailed() throws Exception {
+        BranchProductService branchProductService = new BranchProductServiceImpl();
+        ProductService productService = new ProductServiceImpl();
+        Product product = new Product("Test", 1000, "Test file", Product.ProductType.Quantity);
+        int productId = productService.addProduct(product);
+        product.setId(productId);
+        
+        BranchProduct branchProduct = new BranchProduct();
+        branchProduct.setId("add");
+        branchProduct.setQuantity(40);
+        branchProduct.setProductId(product.getId());
+        branchProduct.setBranchId(branch.getId());
+        
+        branchProductService.addBranchProduct(branchProduct);
+        SQLException assertThrows = assertThrows(SQLException.class, () -> {
+            branchService.deleteBranch(branch.getId());
+        });
+        assertNotNull(assertThrows);
+        branchProductService.deleteBranchProduct(branchProduct.getId());
+        
+        productService.deleteProduct(product.getId());
+        Branch retrievedBranch = branchService.getBranchById(branch.getId());
+        assertNotNull(retrievedBranch);
+    }
+    
     @Test
     public void testGetBranchById() throws Exception {
         Branch retrievedBranch = branchService.getBranchById(branch.getId());

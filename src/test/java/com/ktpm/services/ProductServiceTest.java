@@ -4,8 +4,12 @@
  */
 package com.ktpm.services;
 
+import com.ktpm.pojo.Branch;
+import com.ktpm.pojo.BranchProduct;
 import com.ktpm.pojo.Product;
 import static com.ktpm.pojo.Product.ProductType.Weight;
+import com.ktpm.services.impl.BranchProductServiceImpl;
+import com.ktpm.services.impl.BranchServiceImpl;
 import com.ktpm.services.impl.ProductServiceImpl;
 import com.ktpm.utils.JDBCUtils;
 import java.sql.Connection;
@@ -103,6 +107,30 @@ public class ProductServiceTest {
         Product deletedProduct = productService.getProductById(product.getId());
         // Verify that the deleted product is null
         assertNull(deletedProduct);
+    }
+    @Test
+    public void testDeleteBranchFailed() throws Exception {
+        BranchProductService branchProductService = new BranchProductServiceImpl();
+        BranchService branchService = new BranchServiceImpl();
+        Branch branch = new Branch("test", "Test Branch Product", "Test Branch Product address");
+        branchService.addBranch(branch);
+        
+        BranchProduct branchProduct = new BranchProduct();
+        branchProduct.setId("add");
+        branchProduct.setQuantity(40);
+        branchProduct.setProductId(product.getId());
+        branchProduct.setBranchId(branch.getId());
+        
+        branchProductService.addBranchProduct(branchProduct);
+        
+        SQLException assertThrows = assertThrows(SQLException.class, () -> {
+            productService.deleteProduct(product.getId());
+        });
+        assertNotNull(assertThrows);
+        branchProductService.deleteBranchProduct(branchProduct.getId());
+        branchService.deleteBranch(branch.getId());
+        Product deletedProduct = productService.getProductById(product.getId());
+        assertNotNull(deletedProduct);
     }
 
     @Test
