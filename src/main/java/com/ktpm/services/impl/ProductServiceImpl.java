@@ -81,24 +81,6 @@ public class ProductServiceImpl implements ProductService {
         return product;
     }
 
-    @Override
-    public Product getProductByName(String productName) throws SQLException {
-        String sql = "SELECT * FROM products WHERE product_name = ?";
-        Product product = null;
-        try (Connection conn = JDBCUtils.getConn()) {
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, productName);
-            ResultSet rs = pstmt.executeQuery();
-            if (rs.next()) {
-                product = new Product(rs.getInt("id"),
-                        rs.getString("product_name"),
-                        rs.getDouble("price"),
-                        rs.getString("origin"),
-                        Product.ProductType.valueOf(rs.getString("product_type")));
-            }
-        }
-        return product;
-    }
 
     @Override
     public List<Product> getAllProducts() throws SQLException {

@@ -35,7 +35,7 @@ public class BranchProductServiceImpl implements BranchProductService {
 
     @Override
     public void updateBranchProduct(BranchProduct branchProduct) throws SQLException {
-        String sql = "UPDATE branch_products SET quantity=?, product_id=?, branch_id=? WHERE id=?";
+        String sql = "UPDATE branch_products SET quantity= ?, product_id= ?, branch_id= ? WHERE id=?";
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
             pstmt.setDouble(1, branchProduct.getQuantity());

@@ -6,12 +6,8 @@ package com.ktpm.services;
 
 import com.ktpm.pojo.OrderDetail;
 import com.ktpm.services.impl.OrderDetailServiceImpl;
-import com.ktpm.services.impl.OrderServiceImpl;
 import com.ktpm.utils.JDBCUtils;
 import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class OrderDetailServiceTest {
     private static Connection conn = null;
-    OrderDetailService orderDetailService = new OrderDetailServiceImpl();
+    private static OrderDetailService orderDetailService;
     
     
     public OrderDetailServiceTest() {
@@ -38,7 +34,7 @@ public class OrderDetailServiceTest {
     @BeforeAll
     public static void setUpClass() throws SQLException {
         conn = JDBCUtils.getConn();
-        
+        orderDetailService = new OrderDetailServiceImpl();
     }
     @AfterAll
     public static void tearDownClass() {

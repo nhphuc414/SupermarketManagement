@@ -63,13 +63,13 @@ public class DiscountServiceImpl implements DiscountService {
             pstmt.executeUpdate();
         }
     }
-
     @Override
     public Discount getDiscountById(int id) throws SQLException {
         String sql = "SELECT * FROM discounts WHERE id = ?";
         Discount discount = null;
         try (Connection conn = JDBCUtils.getConn()) {
             PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
              if (rs.next()) {
                  discount = new Discount(rs.getInt("id"),

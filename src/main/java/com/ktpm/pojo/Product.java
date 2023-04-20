@@ -4,7 +4,6 @@
  */
 package com.ktpm.pojo;
 
-import java.util.UUID;
 
 /**
  *

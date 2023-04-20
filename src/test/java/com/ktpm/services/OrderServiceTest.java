@@ -4,30 +4,25 @@
  */
 package com.ktpm.services;
 
-import com.ktpm.pojo.Order;
 import com.ktpm.services.impl.OrderServiceImpl;
 import com.ktpm.utils.JDBCUtils;
 import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+
 import java.sql.SQLException;
-import java.util.List;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 /**
  *
  * @author maikh
  */
 public class OrderServiceTest {
     private static Connection conn = null;
-    OrderService orderService = new OrderServiceImpl();
+    private static OrderService orderService;
     
     
     public OrderServiceTest() {
@@ -36,7 +31,7 @@ public class OrderServiceTest {
     @BeforeAll
     public static void setUpClass() throws SQLException {
             conn = JDBCUtils.getConn();
-        
+            orderService = new OrderServiceImpl();
         
     }
     @AfterAll
